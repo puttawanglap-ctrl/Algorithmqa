@@ -41,7 +41,7 @@
         
         /* 3D Soft Pop Glassmorphism */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 3px solid #ffffff;
@@ -162,14 +162,28 @@
 </head>
 <body class="w-screen h-screen flex flex-col items-center justify-start p-2 md:p-4">
 
-    <!-- สังเคราะห์เสียง SFX -->
+    <!-- สังเคราะห์เสียง SFX เสถียรสูงไร้บั๊ก -->
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioCtx = null;
         let bgMusic = null;
         let isMuted = false;
 
+        function initAudio() {
+            if (!audioCtx) {
+                try {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.warn("Audio Context not supported in this browser environment.", e);
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
         function playSynthSound(type) {
-            if (isMuted) return;
+            initAudio();
+            if (isMuted || !audioCtx) return;
             try {
                 const now = audioCtx.currentTime;
                 if (type === 'click') {
@@ -237,11 +251,14 @@
                     osc.connect(gain); gain.connect(audioCtx.destination);
                     osc.start(); osc.stop(now + 0.35);
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.warn("Audio play failed", e);
+            }
         }
 
         function playMusic() {
-            if (isMuted) return;
+            initAudio();
+            if (isMuted || !audioCtx) return;
             try {
                 if (bgMusic) return;
                 bgMusic = audioCtx.createOscillator();
@@ -260,7 +277,10 @@
             const btn = document.getElementById('btn-mute');
             if (isMuted) {
                 btn.innerHTML = '🔇 ปิด';
-                if (bgMusic) { bgMusic.stop(); bgMusic = null; }
+                if (bgMusic) {
+                    try { bgMusic.stop(); } catch(e){}
+                    bgMusic = null;
+                }
             } else {
                 btn.innerHTML = '🔊 เปิด';
                 playMusic();
@@ -312,7 +332,7 @@
                 <span id="player-coins" class="font-bold text-slate-700">0</span>
             </div>
 
-            <button id="btn-mute" onclick="toggleMusic(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-full text-xs transition">
+            <button id="btn-mute" onclick="initAudio(); toggleMusic(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-full text-xs transition">
                 🔊 เปิด
             </button>
         </div>
@@ -340,19 +360,19 @@
                 <div class="my-2">
                     <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">🎯 เลือกโหมดความสนุก</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2 max-w-lg mx-auto">
-                        <button onclick="selectGameMode('adventure')" id="mode-adventure" class="border-2 border-brandSky bg-sky-50 text-slate-800 font-bold p-2 rounded-2xl transition duration-150 flex flex-col items-center justify-center shadow-sm">
+                        <button onclick="initAudio(); selectGameMode('adventure')" id="mode-adventure" class="border-2 border-brandSky bg-sky-50 text-slate-800 font-bold p-2 rounded-2xl transition duration-150 flex flex-col items-center justify-center shadow-sm">
                             <span class="text-2xl">🏡</span>
                             <span class="font-black text-xs">ตะลุยด่าน</span>
                         </button>
-                        <button onclick="selectGameMode('time')" id="mode-time" class="border-2 border-transparent bg-white text-slate-600 font-bold p-2 rounded-2xl transition duration-150 flex flex-col items-center justify-center shadow-sm">
+                        <button onclick="initAudio(); selectGameMode('time')" id="mode-time" class="border-2 border-transparent bg-white text-slate-600 font-bold p-2 rounded-2xl transition duration-150 flex flex-col items-center justify-center shadow-sm">
                             <span class="text-2xl">⏱️</span>
                             <span class="font-black text-xs">แข่งเวลา</span>
                         </button>
-                        <button onclick="selectGameMode('free')" id="mode-free" class="border-2 border-transparent bg-white text-slate-600 font-bold p-2 rounded-2xl transition duration-150 flex flex-col items-center justify-center shadow-sm">
+                        <button onclick="initAudio(); selectGameMode('free')" id="mode-free" class="border-2 border-transparent bg-white text-slate-600 font-bold p-2 rounded-2xl transition duration-150 flex flex-col items-center justify-center shadow-sm">
                             <span class="text-2xl">🎨</span>
                             <span class="font-black text-xs">สร้างด่านเอง</span>
                         </button>
-                        <button onclick="selectGameMode('puzzle')" id="mode-puzzle" class="border-2 border-transparent bg-white text-slate-600 font-bold p-2 rounded-2xl transition duration-150 flex flex-col items-center justify-center shadow-sm">
+                        <button onclick="initAudio(); selectGameMode('puzzle')" id="mode-puzzle" class="border-2 border-transparent bg-white text-slate-600 font-bold p-2 rounded-2xl transition duration-150 flex flex-col items-center justify-center shadow-sm">
                             <span class="text-2xl">🧩</span>
                             <span class="font-black text-xs">ปริศนา</span>
                         </button>
@@ -364,22 +384,22 @@
                     <h3 class="text-xs font-black text-slate-500 mb-2">🤖 เลือกฮีโร่และสัตว์เลี้ยง</h3>
                     <div class="flex justify-center items-center gap-4 flex-wrap">
                         <div class="flex gap-1.5">
-                            <button onclick="selectCharacter('boy')" id="char-boy" class="border-2 border-brandSky bg-white p-2 rounded-xl text-2xl transition">👦</button>
-                            <button onclick="selectCharacter('girl')" id="char-girl" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">👧</button>
-                            <button onclick="selectCharacter('robot')" id="char-robot" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🤖</button>
-                            <button onclick="selectCharacter('cat')" id="char-cat" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🐱</button>
+                            <button onclick="initAudio(); selectCharacter('boy')" id="char-boy" class="border-2 border-brandSky bg-white p-2 rounded-xl text-2xl transition">👦</button>
+                            <button onclick="initAudio(); selectCharacter('girl')" id="char-girl" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">👧</button>
+                            <button onclick="initAudio(); selectCharacter('robot')" id="char-robot" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🤖</button>
+                            <button onclick="initAudio(); selectCharacter('cat')" id="char-cat" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🐱</button>
                         </div>
                         <div class="w-px h-6 bg-slate-200"></div>
                         <div class="flex gap-1.5">
-                            <button onclick="selectPet('slime')" id="pet-slime" class="border-2 border-brandSky bg-white p-2 rounded-xl text-2xl transition">🟢</button>
-                            <button onclick="selectPet('dragon')" id="pet-dragon" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🐉</button>
-                            <button onclick="selectPet('owl')" id="pet-owl" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🦉</button>
+                            <button onclick="initAudio(); selectPet('slime')" id="pet-slime" class="border-2 border-brandSky bg-white p-2 rounded-xl text-2xl transition">🟢</button>
+                            <button onclick="initAudio(); selectPet('dragon')" id="pet-dragon" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🐉</button>
+                            <button onclick="initAudio(); selectPet('owl')" id="pet-owl" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🦉</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- START BUTTON -->
-                <button onclick="startGame(); playSynthSound('success');" class="btn-game-green w-full max-w-sm text-white text-xl font-black py-3 px-8 rounded-2xl neo-button-shadow transition transform hover:scale-105 active:scale-95 mx-auto">
+                <button onclick="initAudio(); startGame(); playSynthSound('success');" class="btn-game-green w-full max-w-sm text-white text-xl font-black py-3 px-8 rounded-2xl neo-button-shadow transition transform hover:scale-105 active:scale-95 mx-auto">
                     🎮 เริ่มเดินทางผจญภัย
                 </button>
             </div>
@@ -388,7 +408,7 @@
         <!-- SCREEN 2: ROAD MAP (STICKY HEADER, SCROLLABLE PATH) -->
         <section id="screen-map" class="hidden glass-panel rounded-3xl p-4 md:p-6 flex flex-col h-full flex-grow overflow-hidden">
             <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2 flex-shrink-0">
-                <button onclick="goBackToWelcome(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs transition">
+                <button onclick="initAudio(); goBackToWelcome(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs transition">
                     ⬅️ ย้อนกลับ
                 </button>
                 <h3 class="text-lg md:text-xl font-black text-slate-800 flex items-center gap-1.5">
@@ -422,7 +442,7 @@
         <section id="screen-gameplay" class="hidden flex-grow overflow-hidden flex flex-col md:flex-row gap-3 h-full">
             
             <!-- LEFT AREA: GAMEBOARD & LEVEL DETAILS -->
-            <div class="w-full md:w-1/2 flex flex-col gap-2 h-full justify-between">
+            <div class="w-full md:w-1/2 flex flex-col gap-2 h-full justify-between overflow-hidden">
                 
                 <!-- Compact Level Header -->
                 <div class="glass-panel rounded-2xl p-2.5 flex justify-between items-center flex-shrink-0">
@@ -431,10 +451,10 @@
                         <h2 id="gameplay-level-title" class="text-sm md:text-base font-black text-slate-800 mt-0.5">ด่านที่ 1</h2>
                     </div>
                     <div class="flex gap-1.5">
-                        <button onclick="toggleHint(); playSynthSound('click');" class="bg-amber-100 hover:bg-amber-200 text-amber-700 font-extrabold px-2 py-1 rounded-xl text-[10px] flex items-center gap-1">
+                        <button onclick="initAudio(); toggleHint(); playSynthSound('click');" class="bg-amber-100 hover:bg-amber-200 text-amber-700 font-extrabold px-2 py-1 rounded-xl text-[10px] flex items-center gap-1">
                             💡 แนะนำ
                         </button>
-                        <button onclick="exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold px-2 py-1 rounded-xl text-[10px]">
+                        <button onclick="initAudio(); exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold px-2 py-1 rounded-xl text-[10px]">
                             🗺️ แผนที่
                         </button>
                     </div>
@@ -475,22 +495,22 @@
                     </h3>
                     
                     <div class="flex flex-row flex-wrap gap-1.5 overflow-x-auto max-h-[85px] py-1 inner-scroll">
-                        <button onclick="addBlockToWorkspace('up'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-sky-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-sky-700 hover:bg-sky-600 text-[10px] flex-grow">
+                        <button onclick="initAudio(); addBlockToWorkspace('up'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-sky-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-sky-700 hover:bg-sky-600 text-[10px] flex-grow">
                             <span>⬆️</span> <span>ขึ้น</span>
                         </button>
-                        <button onclick="addBlockToWorkspace('down'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-indigo-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-indigo-700 hover:bg-indigo-600 text-[10px] flex-grow">
+                        <button onclick="initAudio(); addBlockToWorkspace('down'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-indigo-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-indigo-700 hover:bg-indigo-600 text-[10px] flex-grow">
                             <span>⬇️</span> <span>ลง</span>
                         </button>
-                        <button onclick="addBlockToWorkspace('left'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-amber-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-amber-700 hover:bg-amber-600 text-[10px] flex-grow">
+                        <button onclick="initAudio(); addBlockToWorkspace('left'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-amber-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-amber-700 hover:bg-amber-600 text-[10px] flex-grow">
                             <span>⬅️</span> <span>ซ้าย</span>
                         </button>
-                        <button onclick="addBlockToWorkspace('right'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-emerald-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-emerald-700 hover:bg-emerald-600 text-[10px] flex-grow">
+                        <button onclick="initAudio(); addBlockToWorkspace('right'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-emerald-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-emerald-700 hover:bg-emerald-600 text-[10px] flex-grow">
                             <span>➡️</span> <span>ขวา</span>
                         </button>
-                        <button onclick="addBlockToWorkspace('collect'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-pink-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-pink-700 hover:bg-pink-600 text-[10px] flex-grow">
+                        <button onclick="initAudio(); addBlockToWorkspace('collect'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-pink-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-pink-700 hover:bg-pink-600 text-[10px] flex-grow">
                             <span>⭐</span> <span>เก็บสมบัติ</span>
                         </button>
-                        <button onclick="addBlockToWorkspace('repeat'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-purple-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-purple-700 hover:bg-purple-600 text-[10px] flex-grow">
+                        <button onclick="initAudio(); addBlockToWorkspace('repeat'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-purple-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-purple-700 hover:bg-purple-600 text-[10px] flex-grow">
                             <span>🔁</span> <span>ทำซ้ำ</span>
                         </button>
                     </div>
@@ -502,7 +522,7 @@
                         <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest">
                             🧩 รันเวย์อัลกอริทึม
                         </h3>
-                        <button onclick="clearWorkspace(); playSynthSound('click');" class="text-rose-500 text-[10px] font-black hover:underline">
+                        <button onclick="initAudio(); clearWorkspace(); playSynthSound('click');" class="text-rose-500 text-[10px] font-black hover:underline">
                             ล้าง 🧹
                         </button>
                     </div>
@@ -517,10 +537,10 @@
 
                     <!-- Control Action Buttons -->
                     <div class="grid grid-cols-2 gap-2 mt-2.5 flex-shrink-0">
-                        <button id="run-btn" onclick="runAlgorithm(); playSynthSound('success');" class="btn-game-green text-white font-black py-2.5 rounded-xl text-sm shadow">
+                        <button id="run-btn" onclick="initAudio(); runAlgorithm(); playSynthSound('success');" class="btn-game-green text-white font-black py-2.5 rounded-xl text-sm shadow">
                             ▶️ รันโค้ดสิ!
                         </button>
-                        <button onclick="stopAlgorithm(); playSynthSound('click');" class="bg-rose-500 border-b-4 border-rose-700 hover:bg-rose-600 text-white font-black py-2.5 rounded-xl text-sm shadow active:scale-95 transition">
+                        <button onclick="initAudio(); stopAlgorithm(); playSynthSound('click');" class="bg-rose-500 border-b-4 border-rose-700 hover:bg-rose-600 text-white font-black py-2.5 rounded-xl text-sm shadow active:scale-95 transition">
                             ⏹️ รีเซ็ต
                         </button>
                     </div>
@@ -532,7 +552,7 @@
         <!-- SCREEN 4: FREE PLAY SANDBOX BUILDER -->
         <section id="screen-freeplay" class="hidden glass-panel rounded-3xl p-4 flex-grow overflow-hidden flex flex-col">
             <div class="flex justify-between items-center mb-3 border-b pb-2 flex-shrink-0">
-                <button onclick="exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs">
+                <button onclick="initAudio(); exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs">
                     ⬅️ แผนที่หลัก
                 </button>
                 <h3 class="text-base font-black text-slate-800">🎨 ออกแบบด่านอย่างอิสระ</h3>
@@ -544,16 +564,16 @@
                     <div>
                         <p class="text-[10px] font-bold text-slate-400 mb-2 uppercase">เลือกไอเทม แล้วแตะช่องตารางขวาเพื่อระบายสี!</p>
                         <div class="flex flex-wrap gap-1.5 mb-3">
-                            <button onclick="selectBrush('hero')" id="brush-hero" class="brush-btn border-2 border-brandSky bg-sky-50 p-2 rounded-xl text-[11px] font-black shadow-sm">
+                            <button onclick="initAudio(); selectBrush('hero')" id="brush-hero" class="brush-btn border-2 border-brandSky bg-sky-50 p-2 rounded-xl text-[11px] font-black shadow-sm">
                                 🏃 ฮีโร่เริ่ม
                             </button>
-                            <button onclick="selectBrush('goal')" id="brush-goal" class="brush-btn border-2 border-transparent bg-white p-2 rounded-xl text-[11px] font-black shadow-sm">
+                            <button onclick="initAudio(); selectBrush('goal')" id="brush-goal" class="brush-btn border-2 border-transparent bg-white p-2 rounded-xl text-[11px] font-black shadow-sm">
                                 🏁 ธงเป้าหมาย
                             </button>
-                            <button onclick="selectBrush('tree')" id="brush-tree" class="brush-btn border-2 border-transparent bg-white p-2 rounded-xl text-[11px] font-black shadow-sm">
+                            <button onclick="initAudio(); selectBrush('tree')" id="brush-tree" class="brush-btn border-2 border-transparent bg-white p-2 rounded-xl text-[11px] font-black shadow-sm">
                                 🌳 ต้นไม้
                             </button>
-                            <button onclick="selectBrush('star')" id="brush-star" class="brush-btn border-2 border-transparent bg-white p-2 rounded-xl text-[11px] font-black shadow-sm">
+                            <button onclick="initAudio(); selectBrush('star')" id="brush-star" class="brush-btn border-2 border-transparent bg-white p-2 rounded-xl text-[11px] font-black shadow-sm">
                                 ⭐ มะนาวดาว
                             </button>
                         </div>
@@ -562,10 +582,10 @@
                     <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 mb-2">
                         <h4 class="text-[10px] font-black text-slate-500 uppercase mb-2">ทดสอบความเก่งกาจด่าน</h4>
                         <div class="flex gap-1.5">
-                            <button onclick="loadCreatedLevel(); playSynthSound('click');" class="btn-game-blue text-white text-[11px] font-black px-4 py-2 rounded-lg shadow">
+                            <button onclick="initAudio(); loadCreatedLevel(); playSynthSound('click');" class="btn-game-blue text-white text-[11px] font-black px-4 py-2 rounded-lg shadow">
                                 🎮 ทดสอบเล่นด่านนี้
                             </button>
-                            <button onclick="clearCreatedLevel(); playSynthSound('click');" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-[11px] font-black px-3 py-2 rounded-lg">
+                            <button onclick="initAudio(); clearCreatedLevel(); playSynthSound('click');" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-[11px] font-black px-3 py-2 rounded-lg">
                                 🧹 ล้างกระดาน
                             </button>
                         </div>
@@ -612,10 +632,10 @@
             </div>
 
             <div class="flex flex-col gap-1.5">
-                <button onclick="nextLevel(); playSynthSound('click');" class="btn-game-green text-white font-black py-2.5 rounded-xl text-sm shadow">
+                <button onclick="initAudio(); nextLevel(); playSynthSound('click');" class="btn-game-green text-white font-black py-2.5 rounded-xl text-sm shadow">
                     ด่านถัดไปเลย ➡️
                 </button>
-                <button onclick="exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1.5 rounded-xl text-xs">
+                <button onclick="initAudio(); exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1.5 rounded-xl text-xs">
                     🗺️ แผนที่หลัก
                 </button>
             </div>
@@ -630,10 +650,10 @@
             <p class="text-xs font-bold text-slate-400 mb-4">คอมพิวเตอร์ชนสิ่งกีดขวางหรือออกนอกแผนที่ตาราง!</p>
 
             <div class="flex flex-col gap-1.5">
-                <button onclick="resetCurrentLevelAfterGameOver(); playSynthSound('click');" class="btn-game-orange text-white font-black py-2.5 rounded-xl text-sm shadow">
+                <button onclick="initAudio(); resetCurrentLevelAfterGameOver(); playSynthSound('click');" class="btn-game-orange text-white font-black py-2.5 rounded-xl text-sm shadow">
                     🔄 แก้ไขอัลกอริทึม (ลองใหม่)
                 </button>
-                <button onclick="exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1.5 rounded-xl text-xs">
+                <button onclick="initAudio(); exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1.5 rounded-xl text-xs">
                     🗺️ แผนที่ด่าน
                 </button>
             </div>
@@ -977,6 +997,7 @@
 
         function resizeCanvas() {
             const container = canvas.parentNode;
+            if (!container) return;
             const size = Math.min(container.clientWidth, container.clientHeight);
             canvas.width = size;
             canvas.height = size;
@@ -1281,22 +1302,43 @@
 
         function selectCharacter(char) {
             gameState.character = char;
-            document.querySelectorAll('[id^="char-"]').forEach(btn => btn.classList.replace('border-brandSky', 'border-transparent'));
-            document.getElementById(`char-${char}`).classList.replace('border-transparent', 'border-brandSky');
+            document.querySelectorAll('[id^="char-"]').forEach(btn => {
+                btn.classList.remove('border-brandSky');
+                btn.classList.add('border-transparent');
+            });
+            const targetBtn = document.getElementById(`char-${char}`);
+            if (targetBtn) {
+                targetBtn.classList.remove('border-transparent');
+                targetBtn.classList.add('border-brandSky');
+            }
             playSynthSound('click');
         }
 
         function selectPet(pet) {
             gameState.pet = pet;
-            document.querySelectorAll('[id^="pet-"]').forEach(btn => btn.classList.replace('border-brandSky', 'border-transparent'));
-            document.getElementById(`pet-${pet}`).classList.replace('border-transparent', 'border-brandSky');
+            document.querySelectorAll('[id^="pet-"]').forEach(btn => {
+                btn.classList.remove('border-brandSky');
+                btn.classList.add('border-transparent');
+            });
+            const targetBtn = document.getElementById(`pet-${pet}`);
+            if (targetBtn) {
+                targetBtn.classList.remove('border-transparent');
+                targetBtn.classList.add('border-brandSky');
+            }
             playSynthSound('click');
         }
 
         function selectGameMode(mode) {
             gameState.mode = mode;
-            document.querySelectorAll('[id^="mode-"]').forEach(btn => btn.classList.replace('border-brandSky', 'border-transparent'));
-            document.getElementById(`mode-${mode}`).classList.replace('border-transparent', 'border-brandSky');
+            document.querySelectorAll('[id^="mode-"]').forEach(btn => {
+                btn.classList.remove('border-brandSky');
+                btn.classList.add('border-transparent');
+            });
+            const targetBtn = document.getElementById(`mode-${mode}`);
+            if (targetBtn) {
+                targetBtn.classList.remove('border-transparent');
+                targetBtn.classList.add('border-brandSky');
+            }
             playSynthSound('click');
         }
 
@@ -1318,6 +1360,7 @@
         // --- สร้างและจัดระดับแผนผังสไตล์เวิลด์คดเคี้ยวเลื่อนได้ ---
         function renderWorldMap() {
             const tabs = document.getElementById('world-tabs');
+            if (!tabs) return;
             tabs.innerHTML = '';
 
             worlds.forEach(w => {
@@ -1347,10 +1390,13 @@
             });
 
             const currWorld = worlds.find(w => w.id === selectedWorldId);
-            document.getElementById('current-world-title').innerText = currWorld.name;
-            document.getElementById('current-world-desc').innerText = currWorld.desc;
+            if (currWorld) {
+                document.getElementById('current-world-title').innerText = currWorld.name;
+                document.getElementById('current-world-desc').innerText = currWorld.desc;
+            }
 
             const pathContainer = document.getElementById('winding-path');
+            if (!pathContainer) return;
             pathContainer.innerHTML = '';
 
             const startLvl = currWorld.range[0];
@@ -1399,7 +1445,9 @@
             if (!lvlConfig) return;
 
             workspaceBlocks = [];
-            document.getElementById('workspace-placeholder').style.display = 'block';
+            const placeholder = document.getElementById('workspace-placeholder');
+            if (placeholder) placeholder.style.display = 'block';
+            
             document.getElementById('workspace-list').innerHTML = `
                 <div id="workspace-placeholder" class="text-center text-slate-400 py-6 text-[10px] font-bold">
                     <span class="block text-xl mb-1">⚙️</span>
@@ -1426,10 +1474,11 @@
 
             const limitBadge = document.getElementById('limit-badge-container');
             if (gameState.mode === 'coding' || lvlNum >= 12) {
-                limitBadge.classList.remove('hidden');
-                document.getElementById('max-blocks-limit').innerText = lvlConfig.limit;
+                if (limitBadge) limitBadge.classList.remove('hidden');
+                const limitEl = document.getElementById('max-blocks-limit');
+                if (limitEl) limitEl.innerText = lvlConfig.limit;
             } else {
-                limitBadge.classList.add('hidden');
+                if (limitBadge) limitBadge.classList.add('hidden');
             }
 
             updateDashboard();
@@ -1444,7 +1493,8 @@
             document.getElementById('player-lv').innerText = gameState.level;
             
             const percent = (gameState.xp / 200) * 100;
-            document.getElementById('xp-bar-fill').style.width = `${percent}%`;
+            const fillEl = document.getElementById('xp-bar-fill');
+            if (fillEl) fillEl.style.width = `${percent}%`;
         }
 
         function exitToMap() {
@@ -1487,8 +1537,9 @@
 
         function removeBlock(idx) {
             workspaceBlocks.splice(idx, 1);
-            if (workspaceBlocks.length === 0) {
-                document.getElementById('workspace-placeholder').style.display = 'block';
+            const placeholder = document.getElementById('workspace-placeholder');
+            if (workspaceBlocks.length === 0 && placeholder) {
+                placeholder.style.display = 'block';
             }
             renderWorkspace();
             playSynthSound('click');
@@ -1497,14 +1548,26 @@
         function clearWorkspace() {
             workspaceBlocks = [];
             renderWorkspace();
-            document.getElementById('workspace-placeholder').style.display = 'block';
+            const placeholder = document.getElementById('workspace-placeholder');
+            if (placeholder) placeholder.style.display = 'block';
         }
 
         function renderWorkspace() {
             const list = document.getElementById('workspace-list');
-            const placeholder = document.getElementById('workspace-placeholder');
+            if (!list) return;
+            
+            // เคลียร์เฉพาะโค้ดบล็อกเก่าที่ไม่ใช่ตัวโฮลเดอร์
             list.innerHTML = '';
-            if (placeholder) list.appendChild(placeholder);
+
+            if (workspaceBlocks.length === 0) {
+                list.innerHTML = `
+                    <div id="workspace-placeholder" class="text-center text-slate-400 py-6 text-xs font-bold">
+                        <span class="block text-2xl mb-1">⚙️</span>
+                        ต่อบล็อกเพื่อจัดลำดับขั้นตอน
+                    </div>
+                `;
+                return;
+            }
 
             workspaceBlocks.forEach((type, idx) => {
                 const blockDiv = document.createElement('div');
@@ -1515,7 +1578,7 @@
                         <span class="bg-black/30 rounded-full w-4 h-4 flex items-center justify-center text-[8px]">${idx + 1}</span>
                         <span>${cmdIcons[type]}</span>
                     </div>
-                    <button onclick="removeBlock(${idx})" class="bg-red-600/60 p-1 rounded-md hover:bg-red-700 transition">❌</button>
+                    <button onclick="removeBlock(${idx}); event.stopPropagation();" class="bg-red-600/60 p-1 rounded-md hover:bg-red-700 transition">❌</button>
                 `;
                 list.appendChild(blockDiv);
             });
@@ -1539,8 +1602,11 @@
             }
 
             isRunningCode = true;
-            document.getElementById('run-btn').disabled = true;
-            document.getElementById('run-btn').classList.add('opacity-50');
+            const runBtn = document.getElementById('run-btn');
+            if (runBtn) {
+                runBtn.disabled = true;
+                runBtn.classList.add('opacity-50');
+            }
 
             codeSequence = [];
             let blockReferenceIndices = [];
@@ -1583,8 +1649,11 @@
         function stopAlgorithm() {
             clearInterval(executionInterval);
             isRunningCode = false;
-            document.getElementById('run-btn').disabled = false;
-            document.getElementById('run-btn').classList.remove('opacity-50');
+            const runBtn = document.getElementById('run-btn');
+            if (runBtn) {
+                runBtn.disabled = false;
+                runBtn.classList.remove('opacity-50');
+            }
             document.querySelectorAll('.scratch-block').forEach(b => b.classList.remove('block-running'));
 
             if (activeLevelConfig) {
@@ -1645,16 +1714,22 @@
             if (gameState.lives <= 0) {
                 clearInterval(executionInterval);
                 isRunningCode = false;
-                document.getElementById('run-btn').disabled = false;
-                document.getElementById('run-btn').classList.remove('opacity-50');
+                const runBtn = document.getElementById('run-btn');
+                if (runBtn) {
+                    runBtn.disabled = false;
+                    runBtn.classList.remove('opacity-50');
+                }
                 document.getElementById('gameover-modal').classList.remove('hidden');
             }
         }
 
         function checkFinalOutcome() {
             isRunningCode = false;
-            document.getElementById('run-btn').disabled = false;
-            document.getElementById('run-btn').classList.remove('opacity-50');
+            const runBtn = document.getElementById('run-btn');
+            if (runBtn) {
+                runBtn.disabled = false;
+                runBtn.classList.remove('opacity-50');
+            }
 
             const isGoal = playerPos.r === activeLevelConfig.goalPos.r && playerPos.c === activeLevelConfig.goalPos.c;
             if (isGoal) {
@@ -1761,7 +1836,7 @@
 
                 spark.animate([
                     { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-                    { transform: `translate(${destX - tx}px, ${destY - ty}px) scale(0)', opacity: 0 }
+                    { transform: `translate(${destX - tx}px, ${destY - ty}px) scale(0)`, opacity: 0 }
                 ], {
                     duration: 500 + Math.random() * 300,
                     easing: 'ease-out',
@@ -1775,6 +1850,7 @@
         // --- โหมดอิสระออกแบบด่านอัจฉริยะ ---
         function setupEditorGrid() {
             const container = document.getElementById('editor-grid-container');
+            if (!container) return;
             container.innerHTML = '';
             for (let r = 0; r < 6; r++) {
                 for (let c = 0; c < 6; c++) {
@@ -1817,8 +1893,15 @@
 
         function selectBrush(brush) {
             selectedBrush = brush;
-            document.querySelectorAll('.brush-btn').forEach(btn => btn.classList.replace('border-brandSky', 'border-transparent'));
-            document.getElementById(`brush-${brush}`).classList.replace('border-transparent', 'border-brandSky');
+            document.querySelectorAll('.brush-btn').forEach(btn => {
+                btn.classList.remove('border-brandSky');
+                btn.classList.add('border-transparent');
+            });
+            const targetBtn = document.getElementById(`brush-${brush}`);
+            if (targetBtn) {
+                targetBtn.classList.remove('border-transparent');
+                targetBtn.classList.add('border-brandSky');
+            }
             playSynthSound('click');
         }
 
@@ -1897,7 +1980,12 @@
 
         window.onload = function() {
             loadGameData();
-            document.addEventListener('touchstart', function() {}, {passive: true});
+            document.addEventListener('touchstart', function() {
+                initAudio();
+            }, {passive: true});
+            document.addEventListener('click', function() {
+                initAudio();
+            }, {passive: true});
             showScreen('screen-welcome');
         }
     </script>
