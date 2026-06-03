@@ -28,72 +28,72 @@
     <!-- Google Fonts: Kanit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2 family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Kanit', sans-serif;
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
-            overflow-x: hidden;
+            overflow: hidden; /* ห้ามเลื่อนหน้าจอหลักเด็ดขาด */
             user-select: none;
             -webkit-user-select: none;
-            touch-action: manipulation;
+            touch-action: none; /* ป้องกันการทัชสกรีนซูมหรือเลื่อนฉากหลัง */
         }
         
         /* 3D Soft Pop Glassmorphism */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 4px solid #ffffff;
-            box-shadow: 0 16px 40px -12px rgba(15, 23, 42, 0.15);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 3px solid #ffffff;
+            box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.12);
         }
 
         .neo-button-shadow {
-            box-shadow: 0 8px 0px 0px rgba(15, 23, 42, 0.1);
+            box-shadow: 0 6px 0px 0px rgba(15, 23, 42, 0.1);
         }
 
         /* Bouncy Soft Duolingo Button */
         .btn-game-orange {
             background-color: #fb923c;
-            border-bottom: 6px solid #ea580c;
+            border-bottom: 5px solid #ea580c;
             transform: translateY(0);
             transition: all 0.1s ease;
         }
         .btn-game-orange:active {
-            transform: translateY(4px);
+            transform: translateY(3px);
             border-bottom-width: 2px;
         }
 
         .btn-game-green {
             background-color: #22c55e;
-            border-bottom: 6px solid #16a34a;
+            border-bottom: 5px solid #16a34a;
             transform: translateY(0);
             transition: all 0.1s ease;
         }
         .btn-game-green:active {
-            transform: translateY(4px);
+            transform: translateY(3px);
             border-bottom-width: 2px;
         }
 
         .btn-game-blue {
             background-color: #06b6d4;
-            border-bottom: 6px solid #0891b2;
+            border-bottom: 5px solid #0891b2;
             transform: translateY(0);
             transition: all 0.1s ease;
         }
         .btn-game-blue:active {
-            transform: translateY(4px);
+            transform: translateY(3px);
             border-bottom-width: 2px;
         }
 
         .btn-game-purple {
             background-color: #a855f7;
-            border-bottom: 6px solid #9333ea;
+            border-bottom: 5px solid #9333ea;
             transform: translateY(0);
             transition: all 0.1s ease;
         }
         .btn-game-purple:active {
-            transform: translateY(4px);
+            transform: translateY(3px);
             border-bottom-width: 2px;
         }
 
@@ -114,7 +114,7 @@
         /* Animations */
         @keyframes gentle-bob {
             0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(1deg); }
+            50% { transform: translateY(-6px) rotate(1deg); }
         }
         .bobbing {
             animation: gentle-bob 4s ease-in-out infinite;
@@ -138,15 +138,31 @@
 
         /* Active highlight for running algorithms */
         .block-running {
-            box-shadow: 0 0 16px #fbbf24, inset 0 0 8px #ffffff !important;
-            transform: scale(1.05);
+            box-shadow: 0 0 14px #fbbf24, inset 0 0 6px #ffffff !important;
+            transform: scale(1.03);
             z-index: 10;
+        }
+
+        /* Custom Scrollbar for inner components */
+        .inner-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .inner-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+        .inner-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .inner-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-start pb-12 px-2 md:px-4">
+<body class="w-screen h-screen flex flex-col items-center justify-start p-2 md:p-4">
 
-    <!-- สังเคราะห์เสียง SFX คลื่นความถี่น่ารัก & เพลงบรรเลงย้อนยุคในตัว -->
+    <!-- สังเคราะห์เสียง SFX -->
     <script>
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let bgMusic = null;
@@ -156,7 +172,6 @@
             if (isMuted) return;
             try {
                 const now = audioCtx.currentTime;
-                
                 if (type === 'click') {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
@@ -165,8 +180,7 @@
                     osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
                     gain.gain.setValueAtTime(0.12, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
                     osc.start(); osc.stop(now + 0.1);
                 } else if (type === 'move') {
                     const osc = audioCtx.createOscillator();
@@ -176,19 +190,17 @@
                     osc.frequency.exponentialRampToValueAtTime(520, now + 0.15);
                     gain.gain.setValueAtTime(0.15, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
                     osc.start(); osc.stop(now + 0.15);
                 } else if (type === 'coin') {
-                    // แฟนฟาร์อาร์เคดสองตัวโน้ต
                     const o1 = audioCtx.createOscillator();
                     const o2 = audioCtx.createOscillator();
                     const g = audioCtx.createGain();
                     o1.type = 'sine'; o2.type = 'sine';
-                    o1.frequency.setValueAtTime(523.25, now); // C5
-                    o1.frequency.setValueAtTime(659.25, now + 0.08); // E5
-                    o2.frequency.setValueAtTime(783.99, now); // G5
-                    o2.frequency.setValueAtTime(1046.50, now + 0.08); // C6
+                    o1.frequency.setValueAtTime(523.25, now);
+                    o1.frequency.setValueAtTime(659.25, now + 0.08);
+                    o2.frequency.setValueAtTime(783.99, now);
+                    o2.frequency.setValueAtTime(1046.50, now + 0.08);
                     g.gain.setValueAtTime(0.15, now);
                     g.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
                     o1.connect(g); o2.connect(g); g.connect(audioCtx.destination);
@@ -204,7 +216,6 @@
                     osc.connect(gain); gain.connect(audioCtx.destination);
                     osc.start(); osc.stop(now + 0.25);
                 } else if (type === 'success') {
-                    // อาคอร์ดเพลงสมองไวระดับพรีเมียม
                     [523.25, 659.25, 783.99, 987.77, 1046.50].forEach((freq, i) => {
                         const osc = audioCtx.createOscillator();
                         const gain = audioCtx.createGain();
@@ -236,7 +247,7 @@
                 bgMusic = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 bgMusic.type = 'sine';
-                bgMusic.frequency.setValueAtTime(329.63, audioCtx.currentTime); // E4
+                bgMusic.frequency.setValueAtTime(329.63, audioCtx.currentTime);
                 bgMusic.connect(gain);
                 gain.connect(audioCtx.destination);
                 gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
@@ -248,294 +259,268 @@
             isMuted = !isMuted;
             const btn = document.getElementById('btn-mute');
             if (isMuted) {
-                btn.innerHTML = '🔇 ปิดเสียง';
+                btn.innerHTML = '🔇 ปิด';
                 if (bgMusic) { bgMusic.stop(); bgMusic = null; }
             } else {
-                btn.innerHTML = '🔊 เปิดเสียง';
+                btn.innerHTML = '🔊 เปิด';
                 playMusic();
             }
         }
     </script>
 
-    <!-- ================= TOP HEAD / STATE DASHBOARD ================= -->
-    <header class="w-full max-w-4xl glass-panel rounded-3xl p-4 mt-4 mb-6 flex flex-wrap justify-between items-center gap-3 relative overflow-hidden">
+    <!-- ================= TOP HEAD / DASHBOARD ================= -->
+    <header class="w-full max-w-4xl glass-panel rounded-2xl p-2 md:p-3 mb-3 flex justify-between items-center relative overflow-hidden flex-shrink-0">
         <div class="absolute -top-12 -right-12 w-28 h-28 bg-brandSky/20 rounded-full blur-xl"></div>
         <div class="absolute -bottom-12 -left-12 w-28 h-28 bg-brandPink/20 rounded-full blur-xl"></div>
 
-        <div class="flex items-center gap-3 relative z-10">
-            <div class="bg-gradient-to-br from-brandYellow to-brandOrange p-3 rounded-2xl shadow-md bobbing">
-                <span class="text-3xl">🤖</span>
+        <div class="flex items-center gap-2 relative z-10">
+            <div class="bg-gradient-to-br from-brandYellow to-brandOrange p-2 rounded-xl shadow-md bobbing">
+                <span class="text-2xl">🤖</span>
             </div>
             <div>
-                <h1 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight leading-none">Algorithm Quest</h1>
-                <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-wider">ผจญภัยโลกโค้ดดิ้งอัจฉริยะ</p>
+                <h1 class="text-lg md:text-xl font-black text-slate-800 tracking-tight leading-none">Algorithm Quest</h1>
+                <p class="text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-wider">ผจญภัยโลกโค้ดดิ้งอัจฉริยะ</p>
             </div>
         </div>
 
         <!-- Duolingo style gamified info -->
-        <div class="flex flex-wrap items-center gap-2 relative z-10">
-            <!-- Streak วันสะสม -->
-            <div class="flex items-center gap-1 bg-amber-50 px-3 py-1.5 rounded-full border-2 border-amber-200">
-                <span class="text-lg">🔥</span>
-                <span id="streak-count" class="font-black text-amber-700 text-sm">3 วัน</span>
+        <div class="flex items-center gap-1.5 md:gap-2 relative z-10 flex-wrap justify-end">
+            <div class="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-full border-2 border-amber-100 text-xs">
+                <span>🔥</span>
+                <span id="streak-count" class="font-black text-amber-700">3 วัน</span>
             </div>
-            <!-- หัวใจพลังชีวิต -->
-            <div class="flex items-center gap-1 bg-rose-50 px-3 py-1.5 rounded-full border-2 border-rose-200">
-                <span class="text-lg">❤️</span>
-                <span id="player-lives" class="font-black text-rose-700 text-sm">3/3</span>
+            <div class="flex items-center gap-1 bg-rose-50 px-2 py-1 rounded-full border-2 border-rose-200 text-xs">
+                <span>❤️</span>
+                <span id="player-lives" class="font-black text-rose-700">3/3</span>
             </div>
-            <!-- เลเวล / XP Bar -->
-            <div class="flex flex-col items-start gap-0.5 bg-indigo-50/50 px-3 py-1 rounded-2xl border-2 border-indigo-100">
-                <div class="flex justify-between w-full text-[10px] font-black text-indigo-700">
+            <!-- เลเวลกะทัดรัด -->
+            <div class="hidden sm:flex flex-col items-start bg-indigo-50/50 px-2.5 py-0.5 rounded-xl border-2 border-indigo-100">
+                <div class="flex justify-between w-full text-[9px] font-black text-indigo-700">
                     <span>LV. <span id="player-lv">1</span></span>
-                    <span><span id="player-xp">120</span>/200 XP</span>
                 </div>
-                <div class="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
-                    <div id="xp-bar-fill" class="h-full bg-indigo-500 rounded-full transition-all duration-500" style="width: 60%"></div>
+                <div class="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div id="xp-bar-fill" class="h-full bg-indigo-500 rounded-full" style="width: 60%"></div>
                 </div>
             </div>
 
-            <!-- อื่นๆ -->
-            <div class="flex items-center gap-1 bg-white px-2.5 py-1.5 rounded-full border border-slate-100 shadow-sm">
-                <span class="text-brandYellow text-base">⭐</span>
-                <span id="player-stars" class="font-bold text-slate-700 text-xs">0</span>
+            <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-full border border-slate-100 text-xs">
+                <span class="text-brandYellow">⭐</span>
+                <span id="player-stars" class="font-bold text-slate-700">0</span>
             </div>
-            <div class="flex items-center gap-1 bg-white px-2.5 py-1.5 rounded-full border border-slate-100 shadow-sm">
-                <span class="text-amber-500 text-base">🪙</span>
-                <span id="player-coins" class="font-bold text-slate-700 text-xs">0</span>
+            <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-full border border-slate-100 text-xs">
+                <span class="text-amber-500">🪙</span>
+                <span id="player-coins" class="font-bold text-slate-700">0</span>
             </div>
 
-            <button id="btn-mute" onclick="toggleMusic(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-full text-xs transition duration-150">
-                🔊 เปิดเสียง
+            <button id="btn-mute" onclick="toggleMusic(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2 py-1 rounded-full text-xs transition">
+                🔊 เปิด
             </button>
         </div>
     </header>
 
-    <!-- ================= MAIN WINDOW CONTAINER ================= -->
-    <main class="w-full max-w-4xl flex-grow">
+    <!-- ================= MAIN CONTAINER ================= -->
+    <main class="w-full max-w-4xl flex-grow overflow-hidden flex flex-col justify-start">
 
-        <!-- SCREEN 1: WELCOME / CHARACTERS SELECTOR -->
-        <section id="screen-welcome" class="glass-panel rounded-3xl p-6 md:p-10 flex flex-col items-center text-center relative overflow-hidden">
-            <!-- Background Clouds -->
-            <div class="absolute top-8 left-4 w-28 h-12 bg-white/60 rounded-full blur-sm cloud-animation z-0"></div>
-            <div class="absolute bottom-16 right-8 w-40 h-16 bg-white/40 rounded-full blur-md cloud-animation z-0" style="animation-delay: -5s"></div>
+        <!-- SCREEN 1: WELCOME SCREEN -->
+        <section id="screen-welcome" class="glass-panel rounded-3xl p-4 md:p-6 flex flex-col justify-center items-center text-center relative overflow-hidden h-full flex-grow">
+            <div class="absolute top-4 left-4 w-28 h-12 bg-white/60 rounded-full blur-sm cloud-animation z-0"></div>
+            <div class="absolute bottom-12 right-6 w-40 h-16 bg-white/40 rounded-full blur-md cloud-animation z-0" style="animation-delay: -5s"></div>
 
-            <div class="relative z-10 max-w-2xl mx-auto">
-                <span class="inline-block bg-brandYellow text-slate-900 font-black text-xs px-4 py-1.5 rounded-full mb-4 shadow-sm transform rotate-1">
-                    ✨ ด่านท้าทายใหม่ล่าสุด 20 ด่าน เล่นฟรี!
-                </span>
-                <h2 class="text-4xl md:text-6xl font-black text-slate-800 mb-2 tracking-tight">
-                    Algorithm Quest <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">Adventure</span>
-                </h2>
-                <p class="text-md md:text-lg text-slate-500 font-bold mb-8">
-                    "เกมโค้ดดิ้งบล็อกสุดน่ารักที่จะเนรมิตสมองลูกคุณให้คิดเป็นขั้นตอนฉบับโปรแกรมเมอร์!"
-                </p>
+            <div class="relative z-10 max-w-xl mx-auto flex flex-col justify-between h-full py-2">
+                <div>
+                    <span class="inline-block bg-brandYellow text-slate-900 font-black text-[10px] md:text-xs px-3 py-1 rounded-full mb-2 shadow-sm">
+                        ✨ คิดเป็นขั้นตอน แก้ปัญหาอย่างชาญฉลาด!
+                    </span>
+                    <h2 class="text-3xl md:text-5xl font-black text-slate-800 tracking-tight leading-tight mb-1">
+                        Algorithm Quest<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">Adventure</span>
+                    </h2>
+                </div>
 
-                <!-- GAME MODES SELECTOR -->
-                <div class="mb-8">
-                    <h3 class="text-sm font-black text-slate-700 uppercase tracking-widest mb-3">🎯 เลือกโหมดความสนุก</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <button onclick="selectGameMode('adventure')" id="mode-adventure" class="border-4 border-brandSky bg-sky-50 text-slate-800 font-bold p-3.5 rounded-3xl transition duration-150 scale-100 hover:scale-105 active:scale-95 shadow">
-                            <span class="block text-3xl mb-1">🏡</span>
-                            <span class="font-black text-sm">ตะลุยด่าน</span>
+                <!-- GAME MODES -->
+                <div class="my-2">
+                    <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">🎯 เลือกโหมดความสนุก</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 max-w-lg mx-auto">
+                        <button onclick="selectGameMode('adventure')" id="mode-adventure" class="border-2 border-brandSky bg-sky-50 text-slate-800 font-bold p-2 rounded-2xl transition duration-150 flex flex-col items-center justify-center shadow-sm">
+                            <span class="text-2xl">🏡</span>
+                            <span class="font-black text-xs">ตะลุยด่าน</span>
                         </button>
-                        <button onclick="selectGameMode('time')" id="mode-time" class="border-4 border-transparent bg-white text-slate-600 font-bold p-3.5 rounded-3xl transition duration-150 scale-100 hover:scale-105 active:scale-95 shadow">
-                            <span class="block text-3xl mb-1">⏱️</span>
-                            <span class="font-black text-sm">จับเวลาสนุก</span>
+                        <button onclick="selectGameMode('time')" id="mode-time" class="border-2 border-transparent bg-white text-slate-600 font-bold p-2 rounded-2xl transition duration-150 flex flex-col items-center justify-center shadow-sm">
+                            <span class="text-2xl">⏱️</span>
+                            <span class="font-black text-xs">แข่งเวลา</span>
                         </button>
-                        <button onclick="selectGameMode('free')" id="mode-free" class="border-4 border-transparent bg-white text-slate-600 font-bold p-3.5 rounded-3xl transition duration-150 scale-100 hover:scale-105 active:scale-95 shadow">
-                            <span class="block text-3xl mb-1">🎨</span>
-                            <span class="font-black text-sm">สร้างด่านเอง</span>
+                        <button onclick="selectGameMode('free')" id="mode-free" class="border-2 border-transparent bg-white text-slate-600 font-bold p-2 rounded-2xl transition duration-150 flex flex-col items-center justify-center shadow-sm">
+                            <span class="text-2xl">🎨</span>
+                            <span class="font-black text-xs">สร้างด่านเอง</span>
                         </button>
-                        <button onclick="selectGameMode('puzzle')" id="mode-puzzle" class="border-4 border-transparent bg-white text-slate-600 font-bold p-3.5 rounded-3xl transition duration-150 scale-100 hover:scale-105 active:scale-95 shadow">
-                            <span class="block text-3xl mb-1">🧩</span>
-                            <span class="font-black text-sm">ปริศนาเงื่อนไข</span>
+                        <button onclick="selectGameMode('puzzle')" id="mode-puzzle" class="border-2 border-transparent bg-white text-slate-600 font-bold p-2 rounded-2xl transition duration-150 flex flex-col items-center justify-center shadow-sm">
+                            <span class="text-2xl">🧩</span>
+                            <span class="font-black text-xs">ปริศนา</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- SELECT HERO & PET -->
-                <div class="mb-8 bg-slate-50/80 p-5 rounded-3xl border-2 border-slate-100">
-                    <h3 class="text-sm font-black text-slate-700 mb-3">🤖 เลือกคู่หูผจญภัย & สัตว์เลี้ยงเลี้ยง</h3>
-                    <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
-                        <!-- Hero Select -->
-                        <div>
-                            <span class="text-xs text-slate-400 block mb-1.5 font-bold">ฮีโร่ของคุณ</span>
-                            <div class="flex gap-2">
-                                <button onclick="selectCharacter('boy')" id="char-boy" class="border-4 border-brandSky bg-white p-3 rounded-2xl w-16 text-3xl transition hover:scale-110 active:scale-95">👦</button>
-                                <button onclick="selectCharacter('girl')" id="char-girl" class="border-4 border-transparent bg-white p-3 rounded-2xl w-16 text-3xl transition hover:scale-110 active:scale-95">👧</button>
-                                <button onclick="selectCharacter('robot')" id="char-robot" class="border-4 border-transparent bg-white p-3 rounded-2xl w-16 text-3xl transition hover:scale-110 active:scale-95">🤖</button>
-                                <button onclick="selectCharacter('cat')" id="char-cat" class="border-4 border-transparent bg-white p-3 rounded-2xl w-16 text-3xl transition hover:scale-110 active:scale-95">🐱</button>
-                            </div>
+                <!-- HERO SELECTOR -->
+                <div class="my-2 bg-slate-50/80 p-3 rounded-2xl border border-slate-100">
+                    <h3 class="text-xs font-black text-slate-500 mb-2">🤖 เลือกฮีโร่และสัตว์เลี้ยง</h3>
+                    <div class="flex justify-center items-center gap-4 flex-wrap">
+                        <div class="flex gap-1.5">
+                            <button onclick="selectCharacter('boy')" id="char-boy" class="border-2 border-brandSky bg-white p-2 rounded-xl text-2xl transition">👦</button>
+                            <button onclick="selectCharacter('girl')" id="char-girl" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">👧</button>
+                            <button onclick="selectCharacter('robot')" id="char-robot" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🤖</button>
+                            <button onclick="selectCharacter('cat')" id="char-cat" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🐱</button>
                         </div>
-                        <div class="w-px h-10 bg-slate-200 hidden sm:block"></div>
-                        <!-- Pet Select -->
-                        <div>
-                            <span class="text-xs text-slate-400 block mb-1.5 font-bold">สัตว์เลี้ยงคู่กาย (บัฟน่ารัก!)</span>
-                            <div class="flex gap-2">
-                                <button onclick="selectPet('slime')" id="pet-slime" class="border-4 border-brandSky bg-white p-3 rounded-2xl w-16 text-3xl transition hover:scale-110 active:scale-95">🟢</button>
-                                <button onclick="selectPet('dragon')" id="pet-dragon" class="border-4 border-transparent bg-white p-3 rounded-2xl w-16 text-3xl transition hover:scale-110 active:scale-95">🐉</button>
-                                <button onclick="selectPet('owl')" id="pet-owl" class="border-4 border-transparent bg-white p-3 rounded-2xl w-16 text-3xl transition hover:scale-110 active:scale-95">🦉</button>
-                            </div>
+                        <div class="w-px h-6 bg-slate-200"></div>
+                        <div class="flex gap-1.5">
+                            <button onclick="selectPet('slime')" id="pet-slime" class="border-2 border-brandSky bg-white p-2 rounded-xl text-2xl transition">🟢</button>
+                            <button onclick="selectPet('dragon')" id="pet-dragon" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🐉</button>
+                            <button onclick="selectPet('owl')" id="pet-owl" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🦉</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- PLAY BUTTON -->
-                <button onclick="startGame(); playSynthSound('success');" class="btn-game-green w-full max-w-md text-white text-3xl font-black py-4 px-10 rounded-3xl neo-button-shadow transition-all duration-150 transform hover:scale-105 active:scale-95">
-                    🎮 เริ่มผจญภัยเลย!
+                <!-- START BUTTON -->
+                <button onclick="startGame(); playSynthSound('success');" class="btn-game-green w-full max-w-sm text-white text-xl font-black py-3 px-8 rounded-2xl neo-button-shadow transition transform hover:scale-105 active:scale-95 mx-auto">
+                    🎮 เริ่มเดินทางผจญภัย
                 </button>
             </div>
         </section>
 
-        <!-- SCREEN 2: PREMIUM ROAD MAP (CANDY CRUSH / DUOLINGO STYLE) -->
-        <section id="screen-map" class="hidden glass-panel rounded-3xl p-6 relative">
-            <div class="flex justify-between items-center mb-6 border-b-2 border-slate-100 pb-4">
-                <button onclick="goBackToWelcome(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-2xl text-sm transition">
+        <!-- SCREEN 2: ROAD MAP (STICKY HEADER, SCROLLABLE PATH) -->
+        <section id="screen-map" class="hidden glass-panel rounded-3xl p-4 md:p-6 flex flex-col h-full flex-grow overflow-hidden">
+            <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2 flex-shrink-0">
+                <button onclick="goBackToWelcome(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs transition">
                     ⬅️ ย้อนกลับ
                 </button>
-                <h3 class="text-2xl font-black text-slate-800 flex items-center gap-2">
-                    🗺️ แผนที่เส้นทางการผจญภัย
+                <h3 class="text-lg md:text-xl font-black text-slate-800 flex items-center gap-1.5">
+                    🗺️ แผนที่เส้นทางการเรียนรู้
                 </h3>
-                <div class="w-16"></div>
+                <div class="w-12"></div>
             </div>
 
-            <!-- WORLD TABS SELECTOR -->
-            <div id="world-tabs" class="grid grid-cols-5 gap-2 mb-6">
-                <!-- แถบเลือกเวิลด์สร้างจากโค้ด JS -->
+            <!-- WORLD TABS -->
+            <div id="world-tabs" class="grid grid-cols-5 gap-1.5 mb-3 flex-shrink-0">
+                <!-- Tabs generated inside JS -->
             </div>
 
-            <!-- WINDING PATH ROAD MAP -->
-            <div class="bg-gradient-to-b from-sky-100 to-indigo-100 rounded-3xl p-6 min-h-[450px] relative overflow-hidden path-container">
-                <div class="absolute inset-0 bg-white/20"></div>
+            <!-- SCROLLABLE PATH CONTAINER -->
+            <div class="flex-grow overflow-y-auto rounded-2xl bg-gradient-to-b from-sky-100 to-indigo-100 p-4 relative path-container inner-scroll">
+                <div class="absolute inset-0 bg-white/10 pointer-events-none"></div>
 
-                <!-- Floating Decor Clouds -->
-                <div class="absolute top-10 left-10 text-4xl opacity-50 bobbing">☁️</div>
-                <div class="absolute top-40 right-10 text-5xl opacity-40 bobbing" style="animation-delay: -2s">☁️</div>
-                <div class="absolute bottom-20 left-20 text-4xl opacity-50 bobbing" style="animation-delay: -1s">☁️</div>
-
-                <!-- World info label -->
-                <div class="relative z-10 bg-white/80 backdrop-blur-md rounded-2xl p-4 border border-white mb-8 max-w-sm">
-                    <h4 id="current-world-title" class="text-lg font-black text-slate-800">🏡 เวิลด์ 1: จุดเริ่มต้นแสนสงบ</h4>
-                    <p id="current-world-desc" class="text-xs font-bold text-slate-400 mt-0.5">หัดเรียนรู้การวางแผนลำดับตารางก้าวแรก</p>
+                <div class="relative z-10 bg-white/90 rounded-xl p-3 border border-white mb-6 max-w-xs mx-auto text-center shadow-sm">
+                    <h4 id="current-world-title" class="text-xs md:text-sm font-black text-slate-800">🏡 เวิลด์ 1: จุดเริ่มต้นแสนสงบ</h4>
+                    <p id="current-world-desc" class="text-[10px] font-bold text-slate-400 mt-0.5">ลากและจัดทิศทางเบื้องต้น</p>
                 </div>
 
-                <!-- Winding Nodes Path (Duolingo style positioning layout) -->
-                <div id="winding-path" class="relative z-10 flex flex-col items-center gap-10 py-10">
-                    <!-- ด่านต่าง ๆ จะถูกสร้างและจัดตำแหน่งสไตล์คดเคี้ยวแบบเวฟด้วย CSS Grid/Absolute -->
+                <!-- Winding Nodes -->
+                <div id="winding-path" class="relative z-10 flex flex-col items-center gap-12 py-4">
+                    <!-- Nodes generated dynamically with absolute wave curves -->
                 </div>
             </div>
         </section>
 
-        <!-- SCREEN 3: GAMEPLAY ZONE (SPLIT LAYOUT) -->
-        <section id="screen-gameplay" class="hidden flex flex-col lg:flex-row gap-6">
+        <!-- SCREEN 3: GAMEPLAY ZONE (FULLY VIEWPORT FITTED, NO SCROLL) -->
+        <section id="screen-gameplay" class="hidden flex-grow overflow-hidden flex flex-col md:flex-row gap-3 h-full">
             
-            <!-- LEFT AREA: GAMEBOARD & TUTORIAL AI CHAT -->
-            <div class="flex-grow flex flex-col gap-4">
+            <!-- LEFT AREA: GAMEBOARD & LEVEL DETAILS -->
+            <div class="w-full md:w-1/2 flex flex-col gap-2 h-full justify-between">
                 
-                <!-- LEVEL HEADER -->
-                <div class="glass-panel rounded-3xl p-4 flex justify-between items-center relative overflow-hidden">
+                <!-- Compact Level Header -->
+                <div class="glass-panel rounded-2xl p-2.5 flex justify-between items-center flex-shrink-0">
                     <div>
-                        <span id="gameplay-world-badge" class="bg-indigo-100 text-indigo-700 text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">WORLD 1</span>
-                        <h2 id="gameplay-level-title" class="text-xl md:text-2xl font-black text-slate-800 mt-1">ด่านที่ 1</h2>
+                        <span id="gameplay-world-badge" class="bg-indigo-100 text-indigo-700 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">WORLD 1</span>
+                        <h2 id="gameplay-level-title" class="text-sm md:text-base font-black text-slate-800 mt-0.5">ด่านที่ 1</h2>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="toggleHint(); playSynthSound('click');" class="bg-amber-100 hover:bg-amber-200 text-amber-700 font-extrabold px-3 py-2 rounded-2xl text-xs transition duration-150 flex items-center gap-1">
-                            💡 ถามเพื่อน AI
+                    <div class="flex gap-1.5">
+                        <button onclick="toggleHint(); playSynthSound('click');" class="bg-amber-100 hover:bg-amber-200 text-amber-700 font-extrabold px-2 py-1 rounded-xl text-[10px] flex items-center gap-1">
+                            💡 แนะนำ
                         </button>
-                        <button onclick="exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold px-3 py-2 rounded-2xl text-xs transition duration-150">
-                            🗺️ ออกแผนที่
+                        <button onclick="exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold px-2 py-1 rounded-xl text-[10px]">
+                            🗺️ แผนที่
                         </button>
                     </div>
                 </div>
 
-                <!-- AI TUTOR BUBBLE -->
-                <div id="ai-bubble" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-3xl p-4 relative shadow-lg transform transition duration-300 flex items-start gap-3 border-2 border-indigo-400">
-                    <span class="text-3xl bobbing">🤖</span>
-                    <div>
-                        <span class="font-black text-brandYellow text-xs block uppercase">คำแนะนำจากโค้ดบอท:</span>
-                        <p id="ai-message" class="text-sm font-semibold mt-1">
+                <!-- Compact AI Tutor Bubble -->
+                <div id="ai-bubble" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-2xl p-2.5 shadow flex items-center gap-2 border-2 border-indigo-400 flex-shrink-0">
+                    <span class="text-xl">🤖</span>
+                    <div class="overflow-hidden">
+                        <span class="font-black text-brandYellow text-[9px] block uppercase leading-none">โค้ดบอทแนะนำ:</span>
+                        <p id="ai-message" class="text-[11px] font-semibold mt-0.5 text-slate-100 truncate md:whitespace-normal">
                             สวัสดีน้อง ๆ! ยินดีต้อนรับเข้าสู่นักคิดสมองไว มาลองจัดลำดับช่องกันได้เลยนะ
                         </p>
                     </div>
                 </div>
 
-                <!-- GAME BOARD CANVAS -->
-                <div class="glass-panel rounded-3xl p-4 flex justify-center items-center relative bg-emerald-50 border-4 border-emerald-400/30">
-                    <div class="relative w-full max-w-[380px] aspect-square bg-[#c4f2c5] rounded-3xl overflow-hidden border-4 border-emerald-500 shadow-inner">
+                <!-- Game Board Canvas Container (Viewport-height constraint) -->
+                <div class="glass-panel rounded-2xl p-2 flex-grow flex items-center justify-center bg-emerald-50 border-2 border-emerald-400/30 overflow-hidden relative">
+                    <div class="w-full max-w-[280px] md:max-w-[320px] aspect-square bg-[#c4f2c5] rounded-xl overflow-hidden border-2 border-emerald-500 shadow-inner">
                         <canvas id="game-canvas" class="w-full h-full block"></canvas>
                     </div>
                 </div>
             </div>
 
-            <!-- RIGHT AREA: SCRATCH-STYLE PROGRAMMING WORKSPACE -->
-            <div class="w-full lg:w-[360px] flex flex-col gap-4">
+            <!-- RIGHT AREA: BLOCKLY PROGRAMMING WORKSPACE -->
+            <div class="w-full md:w-1/2 flex flex-col gap-2 h-full overflow-hidden justify-between">
                 
-                <!-- CODES REMAINING/LIMIT BADGE -->
-                <div id="limit-badge-container" class="hidden bg-orange-50 border-2 border-orange-200 text-orange-800 text-xs font-black p-3 rounded-2xl flex items-center gap-2">
+                <!-- Limit Badge (Compact) -->
+                <div id="limit-badge-container" class="hidden bg-orange-50 border border-orange-200 text-orange-800 text-[10px] font-black p-2 rounded-xl flex items-center gap-1.5 flex-shrink-0">
                     <span>🎯</span>
-                    <span>ภารกิจโค้ดประหยัด! รหัสคอมพิวเตอร์ต้องห้ามเกิน <span id="max-blocks-limit" class="text-base text-orange-600">0</span> บล็อก</span>
+                    <span>ห้ามต่อบล็อกเกิน <span id="max-blocks-limit" class="text-xs text-orange-600">0</span> บล็อก</span>
                 </div>
 
-                <!-- COMMANDS TOOLBOX (SCRATCH STYLING) -->
-                <div class="glass-panel rounded-3xl p-4">
-                    <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-3 pb-2 border-b-2 border-slate-100">
-                        📦 กล่องบล็อกคำสั่ง (เลือกแตะสวมต่อ)
+                <!-- Commands Toolbox (Scratch interlocking jigsaw design) -->
+                <div class="glass-panel rounded-2xl p-2.5 flex-shrink-0">
+                    <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 border-b border-slate-100 pb-1">
+                        📦 แตะกล่องคำสั่งเพื่อเชื่อมต่อ
                     </h3>
                     
-                    <div class="flex flex-row lg:flex-col flex-wrap gap-2 max-h-[160px] lg:max-h-[300px] overflow-auto p-1">
-                        <!-- Up command block -->
-                        <button onclick="addBlockToWorkspace('up'); playSynthSound('click');" class="scratch-block flex items-center gap-2 bg-sky-500 text-white font-black px-4 py-3 rounded-xl shadow-md border-b-4 border-sky-700 hover:bg-sky-600 transition flex-grow">
-                            <span class="text-lg">⬆️</span> <span class="text-xs uppercase">เดินขึ้น (UP)</span>
+                    <div class="flex flex-row flex-wrap gap-1.5 overflow-x-auto max-h-[85px] py-1 inner-scroll">
+                        <button onclick="addBlockToWorkspace('up'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-sky-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-sky-700 hover:bg-sky-600 text-[10px] flex-grow">
+                            <span>⬆️</span> <span>ขึ้น</span>
                         </button>
-                        <!-- Down command block -->
-                        <button onclick="addBlockToWorkspace('down'); playSynthSound('click');" class="scratch-block flex items-center gap-2 bg-indigo-500 text-white font-black px-4 py-3 rounded-xl shadow-md border-b-4 border-indigo-700 hover:bg-indigo-600 transition flex-grow">
-                            <span class="text-lg">⬇️</span> <span class="text-xs uppercase">เดินลง (DOWN)</span>
+                        <button onclick="addBlockToWorkspace('down'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-indigo-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-indigo-700 hover:bg-indigo-600 text-[10px] flex-grow">
+                            <span>⬇️</span> <span>ลง</span>
                         </button>
-                        <!-- Left command block -->
-                        <button onclick="addBlockToWorkspace('left'); playSynthSound('click');" class="scratch-block flex items-center gap-2 bg-amber-500 text-white font-black px-4 py-3 rounded-xl shadow-md border-b-4 border-amber-700 hover:bg-amber-600 transition flex-grow">
-                            <span class="text-lg">⬅️</span> <span class="text-xs uppercase">เดินซ้าย (LEFT)</span>
+                        <button onclick="addBlockToWorkspace('left'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-amber-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-amber-700 hover:bg-amber-600 text-[10px] flex-grow">
+                            <span>⬅️</span> <span>ซ้าย</span>
                         </button>
-                        <!-- Right command block -->
-                        <button onclick="addBlockToWorkspace('right'); playSynthSound('click');" class="scratch-block flex items-center gap-2 bg-emerald-500 text-white font-black px-4 py-3 rounded-xl shadow-md border-b-4 border-emerald-700 hover:bg-emerald-600 transition flex-grow">
-                            <span class="text-lg">➡️</span> <span class="text-xs uppercase">เดินขวา (RIGHT)</span>
+                        <button onclick="addBlockToWorkspace('right'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-emerald-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-emerald-700 hover:bg-emerald-600 text-[10px] flex-grow">
+                            <span>➡️</span> <span>ขวา</span>
                         </button>
-                        <!-- Collect command block -->
-                        <button onclick="addBlockToWorkspace('collect'); playSynthSound('click');" class="scratch-block flex items-center gap-2 bg-pink-500 text-white font-black px-4 py-3 rounded-xl shadow-md border-b-4 border-pink-700 hover:bg-pink-600 transition flex-grow">
-                            <span class="text-lg">⭐</span> <span class="text-xs uppercase">เก็บสมบัติ (COLLECT)</span>
+                        <button onclick="addBlockToWorkspace('collect'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-pink-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-pink-700 hover:bg-pink-600 text-[10px] flex-grow">
+                            <span>⭐</span> <span>เก็บสมบัติ</span>
                         </button>
-                        <!-- Loop repeat command block -->
-                        <button onclick="addBlockToWorkspace('repeat'); playSynthSound('click');" class="scratch-block flex items-center gap-2 bg-purple-500 text-white font-black px-4 py-3 rounded-xl shadow-md border-b-4 border-purple-700 hover:bg-purple-600 transition flex-grow">
-                            <span class="text-lg">🔁</span> <span class="text-xs uppercase">ทำซ้ำ 2 ครั้ง</span>
+                        <button onclick="addBlockToWorkspace('repeat'); playSynthSound('click');" class="scratch-block flex items-center gap-1 bg-purple-500 text-white font-black px-2.5 py-1.5 rounded-lg shadow-sm border-b-2 border-purple-700 hover:bg-purple-600 text-[10px] flex-grow">
+                            <span>🔁</span> <span>ทำซ้ำ</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- WORKSPACE STAGE (ORDER SEQUENCE) -->
-                <div class="glass-panel rounded-3xl p-4 flex flex-col flex-grow min-h-[220px]">
-                    <div class="flex justify-between items-center mb-3 pb-2 border-b-2 border-slate-100">
-                        <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest">
-                            🧩 รันเวย์อัลกอริทึมของคุณ
+                <!-- Workspace Runway (Responsive Height Fit) -->
+                <div class="glass-panel rounded-2xl p-3 flex-grow flex flex-col overflow-hidden">
+                    <div class="flex justify-between items-center mb-1.5 flex-shrink-0">
+                        <h3 class="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                            🧩 รันเวย์อัลกอริทึม
                         </h3>
-                        <button onclick="clearWorkspace(); playSynthSound('click');" class="text-rose-500 text-xs font-black hover:underline">
-                            เคลียร์โค้ด 🧹
+                        <button onclick="clearWorkspace(); playSynthSound('click');" class="text-rose-500 text-[10px] font-black hover:underline">
+                            ล้าง 🧹
                         </button>
                     </div>
 
-                    <!-- Flow workspace list -->
-                    <div id="workspace-list" class="flex-grow flex flex-col gap-2.5 overflow-y-auto max-h-[240px] p-2 bg-slate-100 rounded-2xl min-h-[120px]">
-                        <div id="workspace-placeholder" class="text-center text-slate-400 py-8 text-xs font-bold">
-                            <span class="block text-4xl mb-1">🎮</span>
-                            แตะบล็อกด้านบนเพื่อจัดลำดับคำสั่งที่นี่!
+                    <!-- Flow workspace list (Fits height perfectly) -->
+                    <div id="workspace-list" class="flex-grow overflow-y-auto p-1.5 bg-slate-100 rounded-xl flex flex-col gap-1.5 inner-scroll">
+                        <div id="workspace-placeholder" class="text-center text-slate-400 py-6 text-xs font-bold">
+                            <span class="block text-2xl mb-1">⚙️</span>
+                            ต่อบล็อกเพื่อจัดลำดับขั้นตอน
                         </div>
                     </div>
 
-                    <!-- Control Buttons -->
-                    <div class="grid grid-cols-2 gap-3 mt-4">
-                        <button id="run-btn" onclick="runAlgorithm(); playSynthSound('success');" class="btn-game-green text-white font-black py-3.5 rounded-2xl text-lg shadow">
+                    <!-- Control Action Buttons -->
+                    <div class="grid grid-cols-2 gap-2 mt-2.5 flex-shrink-0">
+                        <button id="run-btn" onclick="runAlgorithm(); playSynthSound('success');" class="btn-game-green text-white font-black py-2.5 rounded-xl text-sm shadow">
                             ▶️ รันโค้ดสิ!
                         </button>
-                        <button onclick="stopAlgorithm(); playSynthSound('click');" class="bg-rose-500 border-b-6 border-rose-700 hover:bg-rose-600 text-white font-black py-3.5 rounded-2xl text-lg shadow active:scale-95 transition">
+                        <button onclick="stopAlgorithm(); playSynthSound('click');" class="bg-rose-500 border-b-4 border-rose-700 hover:bg-rose-600 text-white font-black py-2.5 rounded-xl text-sm shadow active:scale-95 transition">
                             ⏹️ รีเซ็ต
                         </button>
                     </div>
@@ -545,50 +530,52 @@
         </section>
 
         <!-- SCREEN 4: FREE PLAY SANDBOX BUILDER -->
-        <section id="screen-freeplay" class="hidden glass-panel rounded-3xl p-6">
-            <div class="flex justify-between items-center mb-4 border-b-2 pb-3">
-                <button onclick="exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-2xl text-sm">
+        <section id="screen-freeplay" class="hidden glass-panel rounded-3xl p-4 flex-grow overflow-hidden flex flex-col">
+            <div class="flex justify-between items-center mb-3 border-b pb-2 flex-shrink-0">
+                <button onclick="exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-xl text-xs">
                     ⬅️ แผนที่หลัก
                 </button>
-                <h3 class="text-xl font-black text-slate-800">🎨 โหมดสร้างด่านอัจฉริยะอิสระ</h3>
-                <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">Sandbox</span>
+                <h3 class="text-base font-black text-slate-800">🎨 ออกแบบด่านอย่างอิสระ</h3>
+                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Sandbox</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <p class="text-xs font-bold text-slate-400 mb-2 uppercase">แตะเลือกของขวัญด้านล่าง แล้วเอาไปวางที่ตารางด้านขวาได้เลย!</p>
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        <button onclick="selectBrush('hero')" id="brush-hero" class="brush-btn border-2 border-brandSky bg-sky-50 p-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 shadow">
-                            🏃 ตัวละครสตาร์ท
-                        </button>
-                        <button onclick="selectBrush('goal')" id="brush-goal" class="brush-btn border-2 border-transparent bg-white p-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 shadow">
-                            🏁 ธงเส้นชัย
-                        </button>
-                        <button onclick="selectBrush('tree')" id="brush-tree" class="brush-btn border-2 border-transparent bg-white p-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 shadow">
-                            🌳 ต้นกีดขวาง
-                        </button>
-                        <button onclick="selectBrush('star')" id="brush-star" class="brush-btn border-2 border-transparent bg-white p-2.5 rounded-xl text-xs font-black flex items-center gap-1.5 shadow">
-                            ⭐ เหรียญสมบัติ
-                        </button>
+            <div class="flex-grow flex flex-col md:flex-row gap-4 overflow-hidden">
+                <div class="w-full md:w-1/2 flex flex-col justify-between">
+                    <div>
+                        <p class="text-[10px] font-bold text-slate-400 mb-2 uppercase">เลือกไอเทม แล้วแตะช่องตารางขวาเพื่อระบายสี!</p>
+                        <div class="flex flex-wrap gap-1.5 mb-3">
+                            <button onclick="selectBrush('hero')" id="brush-hero" class="brush-btn border-2 border-brandSky bg-sky-50 p-2 rounded-xl text-[11px] font-black shadow-sm">
+                                🏃 ฮีโร่เริ่ม
+                            </button>
+                            <button onclick="selectBrush('goal')" id="brush-goal" class="brush-btn border-2 border-transparent bg-white p-2 rounded-xl text-[11px] font-black shadow-sm">
+                                🏁 ธงเป้าหมาย
+                            </button>
+                            <button onclick="selectBrush('tree')" id="brush-tree" class="brush-btn border-2 border-transparent bg-white p-2 rounded-xl text-[11px] font-black shadow-sm">
+                                🌳 ต้นไม้
+                            </button>
+                            <button onclick="selectBrush('star')" id="brush-star" class="brush-btn border-2 border-transparent bg-white p-2 rounded-xl text-[11px] font-black shadow-sm">
+                                ⭐ มะนาวดาว
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="bg-slate-50 p-4 rounded-3xl border border-slate-100">
-                        <h4 class="text-xs font-black text-slate-500 uppercase tracking-wider mb-2">กล่องควบคุมการทดสอบ</h4>
-                        <div class="flex gap-2">
-                            <button onclick="loadCreatedLevel(); playSynthSound('click');" class="btn-game-blue text-white text-xs font-black px-4 py-2.5 rounded-xl shadow">
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100 mb-2">
+                        <h4 class="text-[10px] font-black text-slate-500 uppercase mb-2">ทดสอบความเก่งกาจด่าน</h4>
+                        <div class="flex gap-1.5">
+                            <button onclick="loadCreatedLevel(); playSynthSound('click');" class="btn-game-blue text-white text-[11px] font-black px-4 py-2 rounded-lg shadow">
                                 🎮 ทดสอบเล่นด่านนี้
                             </button>
-                            <button onclick="clearCreatedLevel(); playSynthSound('click');" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-black px-4 py-2.5 rounded-xl">
-                                🧹 เคลียร์ตาราง
+                            <button onclick="clearCreatedLevel(); playSynthSound('click');" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-[11px] font-black px-3 py-2 rounded-lg">
+                                🧹 ล้างกระดาน
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex justify-center items-center">
-                    <div class="w-full max-w-[300px] aspect-square bg-[#bae6fd]/20 border-4 border-dashed border-sky-300 rounded-3xl p-2">
+                <div class="w-full md:w-1/2 flex justify-center items-center">
+                    <div class="w-full max-w-[240px] md:max-w-[280px] aspect-square bg-[#bae6fd]/20 border-2 border-dashed border-sky-300 rounded-2xl p-1.5">
                         <div id="editor-grid-container" class="grid grid-cols-6 grid-rows-6 gap-1 w-full h-full">
-                            <!-- JS จะเติมช่องให้แตะวาดได้อย่างอิสระ -->
+                            <!-- JS Editor -->
                         </div>
                     </div>
                 </div>
@@ -597,99 +584,97 @@
 
     </main>
 
-    <!-- ================= MODERN POP-UP MODALS (STAR GAIN WITH ANIMATION) ================= -->
+    <!-- ================= MODERN MODALS ================= -->
     
-    <!-- LEVEL COMPLETION REWARD PANEL -->
-    <div id="success-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-        <div class="glass-panel w-full max-w-md rounded-[32px] p-6 text-center transform scale-95 transition-all duration-300 relative overflow-hidden border-8 border-brandMint">
-            
-            <div id="stars-congratulations" class="text-6xl my-4 text-center">⭐ ⭐ ⭐</div>
-            <h3 class="text-3xl font-black text-slate-800 mb-1">ยอดเยี่ยมมาก แชมเปี้ยน!</h3>
-            <p id="star-efficiency-message" class="text-sm font-bold text-slate-400 mb-6">คุณบรรลุเป้าหมายการเขียนโค้ดด้วยวิธีที่ดีที่สุด!</p>
+    <!-- LEVEL COMPLETION MODAL -->
+    <div id="success-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-5 text-center transform scale-95 transition-all relative overflow-hidden border-4 border-brandMint">
+            <div id="stars-congratulations" class="text-5xl my-2">⭐ ⭐ ⭐</div>
+            <h3 class="text-2xl font-black text-slate-800">ยอดเยี่ยมมาก แชมเปี้ยน!</h3>
+            <p id="star-efficiency-message" class="text-xs font-bold text-slate-400 mb-4">คุณเขียนโค้ดได้กระชับและสมบูรณ์แบบมาก</p>
 
-            <!-- Rewards Box details -->
-            <div class="bg-indigo-50/50 border-2 border-indigo-100 rounded-2xl p-4 mb-6 grid grid-cols-3 gap-2">
+            <div class="bg-indigo-50/50 border rounded-xl p-3 mb-4 grid grid-cols-3 gap-1">
                 <div>
-                    <span class="block text-2xl">🪙</span>
-                    <span class="block text-[10px] font-black text-slate-400">เหรียญทอง</span>
-                    <span id="reward-coins" class="text-lg font-black text-slate-800">+10</span>
+                    <span class="block text-xl">🪙</span>
+                    <span class="block text-[9px] font-black text-slate-400">เหรียญทอง</span>
+                    <span id="reward-coins" class="text-sm font-black text-slate-800">+10</span>
                 </div>
                 <div>
-                    <span class="block text-2xl">🔥</span>
-                    <span class="block text-[10px] font-black text-slate-400">โบนัส XP</span>
-                    <span id="reward-xp" class="text-lg font-black text-indigo-700">+50 XP</span>
+                    <span class="block text-xl">🔥</span>
+                    <span class="block text-[9px] font-black text-slate-400">โบนัส XP</span>
+                    <span id="reward-xp" class="text-sm font-black text-indigo-700">+50 XP</span>
                 </div>
                 <div>
-                    <span class="block text-2xl">🎁</span>
-                    <span class="block text-[10px] font-black text-slate-400">ของขวัญ</span>
-                    <span id="reward-item" class="text-xs font-black text-emerald-600">สกินสไลม์</span>
+                    <span class="block text-xl">🎁</span>
+                    <span class="block text-[9px] font-black text-slate-400">สัตว์เลี้ยง</span>
+                    <span id="reward-item" class="text-[10px] font-black text-emerald-600">สไลม์คู่ใจ</span>
                 </div>
             </div>
 
-            <div class="flex flex-col gap-2">
-                <button onclick="nextLevel(); playSynthSound('click');" class="btn-game-green text-white font-black py-3.5 rounded-2xl text-lg shadow">
+            <div class="flex flex-col gap-1.5">
+                <button onclick="nextLevel(); playSynthSound('click');" class="btn-game-green text-white font-black py-2.5 rounded-xl text-sm shadow">
                     ด่านถัดไปเลย ➡️
                 </button>
-                <button onclick="exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-2xl text-xs">
+                <button onclick="exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1.5 rounded-xl text-xs">
                     🗺️ แผนที่หลัก
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- GAME OVER / RE-ALGORITHM MODAL -->
-    <div id="gameover-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-        <div class="glass-panel w-full max-w-md rounded-[32px] p-6 text-center border-8 border-rose-500">
-            <span class="text-6xl inline-block bobbing mb-3">❌🤖</span>
-            <h3 class="text-3xl font-black text-slate-800 mb-1">พลังงานคอมพิวเตอร์พัง!</h3>
-            <p class="text-sm font-bold text-slate-400 mb-6">อัลกอริทึมคลาดเคลื่อนไปชนสิ่งกีดขวางหรือออกนอกระบบ!</p>
+    <!-- GAME OVER MODAL -->
+    <div id="gameover-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-5 text-center border-4 border-rose-500">
+            <span class="text-5xl inline-block bobbing mb-2">❌🤖</span>
+            <h3 class="text-2xl font-black text-slate-800">พลังงานจำลองชำรุด!</h3>
+            <p class="text-xs font-bold text-slate-400 mb-4">คอมพิวเตอร์ชนสิ่งกีดขวางหรือออกนอกแผนที่ตาราง!</p>
 
-            <div class="flex flex-col gap-2">
-                <button onclick="resetCurrentLevelAfterGameOver(); playSynthSound('click');" class="btn-game-orange text-white font-black py-3.5 rounded-2xl text-lg shadow">
-                    🔄 แก้ไขสคริปต์ (ลองใหม่)
+            <div class="flex flex-col gap-1.5">
+                <button onclick="resetCurrentLevelAfterGameOver(); playSynthSound('click');" class="btn-game-orange text-white font-black py-2.5 rounded-xl text-sm shadow">
+                    🔄 แก้ไขอัลกอริทึม (ลองใหม่)
                 </button>
-                <button onclick="exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 rounded-2xl text-xs">
+                <button onclick="exitToMap(); playSynthSound('click');" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-1.5 rounded-xl text-xs">
                     🗺️ แผนที่ด่าน
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- FINAL COMPLETION / CERTIFICATE -->
-    <div id="certificate-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md overflow-y-auto">
-        <div class="glass-panel w-full max-w-2xl rounded-[36px] p-6 text-center my-8 border-8 border-brandYellow">
-            <h3 class="text-3xl font-black text-slate-800 mb-1">🎓 ยินดีด้วยอย่างเป็นทางการ!</h3>
-            <p class="text-sm font-semibold text-slate-400 mb-6">คุณบรรลุเป้าหมายครบถ้วน 20 ด่านหลักเรียบร้อยแล้ว!</p>
+    <!-- CERTIFICATE MODAL -->
+    <div id="certificate-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto">
+        <div class="glass-panel w-full max-w-xl rounded-3xl p-5 text-center my-4 border-4 border-brandYellow">
+            <h3 class="text-2xl font-black text-slate-800">🎓 เกียรติบัตรนักโค้ดอัจฉริยะ!</h3>
+            <p class="text-xs font-semibold text-slate-400 mb-4">คุณผ่านวิถีความรู้การคิดเป็นขั้นตอนครบ 20 ด่านแล้ว</p>
 
-            <div class="bg-amber-50 p-5 rounded-3xl border-4 border-dashed border-amber-300 max-w-xl mx-auto relative overflow-hidden" id="certificate-print-area">
-                <div class="bg-white p-6 rounded-2xl border border-amber-200">
-                    <span class="text-5xl block mb-2">🏆👑🎓👑🏆</span>
-                    <h4 class="text-2xl font-black text-amber-600">ใบประกาศเกียรติคุณนักอัลกอริทึม</h4>
-                    <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-6">ALGORITHM HERO CERTIFICATE</p>
+            <div class="bg-amber-50 p-3 rounded-2xl border-2 border-dashed border-amber-200 max-w-md mx-auto" id="certificate-print-area">
+                <div class="bg-white p-4 rounded-xl border border-amber-100">
+                    <span class="text-3xl block mb-1">🏆🎓🏆</span>
+                    <h4 class="text-lg font-black text-amber-600">ใบรับรองฮีโร่อัลกอริทึม</h4>
+                    <p class="text-[8px] text-slate-400 tracking-wider mb-3">ALGORITHM QUEST ACADEMY</p>
 
-                    <p class="text-xs text-slate-500 font-bold">เกียรติบัตรนี้มอบให้เพื่อแสดงว่า</p>
-                    <input id="cert-student-name" type="text" value="โปรแกรมเมอร์รุ่นเยาว์" class="text-xl font-black text-slate-800 border-b-2 border-slate-300 text-center focus:outline-none focus:border-brandSky px-2 my-4 w-72 block mx-auto">
-                    <p class="text-xs text-slate-500 font-bold">ได้สำเร็จหลักสูตรผจญภัยแนวคิดการวิเคราะห์แก้ปัญหาเป็นระบบสะสมดาวครบถ้วนสมบูรณ์</p>
+                    <p class="text-[10px] text-slate-500 font-bold">เกียรติบัตรรับรองแก่</p>
+                    <input id="cert-student-name" type="text" value="ยอดนักโปรแกรมเมอร์น้อย" class="text-md font-black text-slate-800 border-b border-slate-200 text-center focus:outline-none px-2 my-2 w-48 block mx-auto">
+                    <p class="text-[9px] text-slate-500">ได้พัฒนาสมองแก้ปัญหาด้วยแนวคิดคอมพิวเตอร์อย่างลื่นไหล</p>
 
-                    <div class="flex justify-between items-end mt-8 border-t-2 pt-4 border-slate-100">
+                    <div class="flex justify-between items-end mt-4 border-t pt-2 border-slate-100">
                         <div class="text-left">
-                            <span class="block text-[10px] text-slate-400 font-bold uppercase">วันที่ประกาศเกียรติผล:</span>
-                            <span id="cert-date" class="text-xs font-black text-slate-700">01 มกราคม 2026</span>
+                            <span class="block text-[8px] text-slate-400 font-bold">วันที่ได้รับ:</span>
+                            <span id="cert-date" class="text-[10px] font-black text-slate-700">01 มกราคม 2026</span>
                         </div>
-                        <div class="w-16 h-16 border border-slate-200 rounded p-1">
+                        <div class="w-10 h-10 border border-slate-200 rounded p-0.5">
                             <svg viewBox="0 0 100 100" class="w-full h-full text-slate-800">
-                                <path d="M0,0 h30 v30 h-30 z M10,10 h10 v10 h-10 z M70,0 h30 v30 h-30 z M80,10 h10 v10 h-10 z M0,70 h30 v30 h-30 z M10,80 h10 v10 h-10 z M40,40 h20 v20 h-20 z M50,10 h10 v10 h-10 z" fill="currentColor"/>
+                                <path d="M0,0 h30 v30 h-30 z M10,10 h10 v10 h-10 z M70,0 h30 v30 h-30 z M80,10 h10 v10 h-10 z M0,70 h30 v30 h-30 z M10,80 h10 v10 h-10 z M40,40 h20 v20 h-20 z" fill="currentColor"/>
                             </svg>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3 justify-center mt-6">
-                <button onclick="window.print();" class="btn-game-blue text-white font-black px-6 py-3 rounded-2xl shadow">
-                    🖨️ พิมพ์ใบรับรอง (PDF)
+            <div class="flex gap-2 justify-center mt-4">
+                <button onclick="window.print();" class="btn-game-blue text-white font-black px-4 py-2 rounded-xl text-xs shadow">
+                    🖨️ พิมพ์เกียรติบัตร (PDF)
                 </button>
-                <button onclick="exitToMap();" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-6 py-3 rounded-2xl text-xs">
+                <button onclick="exitToMap();" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs">
                     🗺️ หน้าแผนที่หลัก
                 </button>
             </div>
@@ -698,7 +683,7 @@
 
     <!-- ==================== CORE GAME LOGIC (JAVASCRIPT) ==================== -->
     <script>
-        // --- ข้อมูลสถานะความสำเร็จของผู้เล่นแบบละเอียด ---
+        // --- ผู้ใช้งานเกมและการบันทึกสเตตัส ---
         let gameState = {
             unlockedLevels: 1,
             currentLevel: 1,
@@ -714,26 +699,12 @@
             streak: 3
         };
 
-        // ตาราง Level Road (Candy Crush style layout coordinate curve)
-        const pathCoords = [
-            { x: 50, y: 85 },  // Level 1
-            { x: 30, y: 75 },  // Level 2
-            { x: 40, y: 65 },  // Level 3
-            { x: 70, y: 60 },  // Level 4
-            { x: 60, y: 48 },  // Level 5
-            { x: 30, y: 42 },  // Level 6
-            { x: 20, y: 30 },  // Level 7
-            { x: 50, y: 22 },  // Level 8
-            { x: 75, y: 15 },  // Level 9
-            { x: 50, y: 5 },   // Level 10
-        ];
-
         const worlds = [
-            { id: 1, name: "🏡 Home Village", desc: "หัดเขียนโค้ดและขยับทิศทางพื้นฐาน ด่าน 1-4", range: [1, 4] },
-            { id: 2, name: "🌳 Forest World", desc: "ด่านหลบหลีกต้นไม้ใบหญ้าและสิ่งกีดขวาง ด่าน 5-8", range: [5, 8] },
-            { id: 3, name: "🏞️ River Valley", desc: "สะสมเหรียญทางอ้อมข้ามแม่น้ำอุปสรรค ด่าน 9-12", range: [9, 12] },
-            { id: 4, name: "🏰 Castle Land", desc: "ตะลุยด่านพิศวงหลบหลุมพรางปราสาทลึกลับ ด่าน 13-16", range: [13, 16] },
-            { id: 5, name: "🚀 Space Kingdom", desc: "โหมดล้ำอนาคตจัดชุดโค้ดให้สั้นจำกัด ด่าน 17-20", range: [17, 20] }
+            { id: 1, name: "🏡 Home Village", desc: "หัดขยับและจัดลำดับตารางเบื้องต้น ด่าน 1-4", range: [1, 4] },
+            { id: 2, name: "🌳 Forest World", desc: "ด่านหลีกเลี่ยงต้นไม้ใบหญ้าสุดทรหด ด่าน 5-8", range: [5, 8] },
+            { id: 3, name: "🏞️ River Valley", desc: "รวบรวมเหรียญทองข้ามสะพานแม่น้ำลึก ด่าน 9-12", range: [9, 12] },
+            { id: 4, name: "🏰 Castle Land", desc: "ไขปริศนาอ้อมหลุมพรางห้องใต้ดิน ด่าน 13-16", range: [13, 16] },
+            { id: 5, name: "🚀 Space Kingdom", desc: "โหมดอวกาศระดับบอสประหยัดรหัสโค้ดสูงสุด ด่าน 17-20", range: [17, 20] }
         ];
 
         let selectedWorldId = 1;
@@ -949,7 +920,7 @@
                 limit: 7
             },
             18: {
-                title: "โค้ดประหยัดพลังงานไฟฟ้",
+                title: "โค้ดประหยัดพลังงานไฟฟ้า",
                 hint: "ใช้จำนวนบล็อกจำกัด พยายามรวมคำสั่งซ้ำด้วยบล็อก 'Repeat' สองครั้งสิ!",
                 grid: [
                     ['0', '0', '0', 'G'],
@@ -989,11 +960,9 @@
             }
         };
 
-        // --- Sandbox Custom Level ---
         let customGrid = Array(6).fill(null).map(() => Array(6).fill('0'));
         let selectedBrush = 'hero';
 
-        // --- ลอจิกควบคุมการรันแอนิเมชัน ---
         let activeLevelConfig = null;
         let playerPos = { r: 0, c: 0 };
         let gatheredCollectibles = 0;
@@ -1003,19 +972,19 @@
         let workspaceBlocks = [];
         let executionInterval = null;
 
-        // --- ระบบ Canvas Rendering ---
         const canvas = document.getElementById('game-canvas');
         const ctx = canvas.getContext('2d');
 
         function resizeCanvas() {
-            const rect = canvas.parentNode.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.width;
+            const container = canvas.parentNode;
+            const size = Math.min(container.clientWidth, container.clientHeight);
+            canvas.width = size;
+            canvas.height = size;
             drawGame();
         }
         window.addEventListener('resize', resizeCanvas);
 
-        // --- การวาดสไตล์ Vector ลื่นไหล 60 FPS ---
+        // --- วาดฉาก 60 FPS ด้วยรูปแบบ Vector ---
         function drawGame() {
             if (!canvas.width) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1027,7 +996,6 @@
             const cols = grid[0].length;
             const cellSize = canvas.width / cols;
 
-            // 1. ตารางตารางพื้นหลังเขียวอ่อนและเข้มแบบลายตารางแสนสวย
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
                     const x = c * cellSize;
@@ -1040,19 +1008,17 @@
                     }
                     ctx.fillRect(x, y, cellSize, cellSize);
 
-                    // วาดขอบตารางบางเบา
                     ctx.strokeStyle = 'rgba(0,0,0,0.04)';
-                    ctx.lineWidth = 2;
+                    ctx.lineWidth = 1.5;
                     ctx.strokeRect(x, y, cellSize, cellSize);
 
-                    // วาดวัตถุต่าง ๆ 
                     const cell = grid[r][c];
                     if (cell === '1') {
                         drawObstacle(x, y, cellSize, r % 2 === 0 ? 'tree' : 'rock');
                     } else if (cell === '2') {
-                        drawStar(x + cellSize/2, y + cellSize/2, cellSize * 0.3);
+                        drawStar(x + cellSize/2, y + cellSize/2, cellSize * 0.28);
                     } else if (cell === '3') {
-                        drawCoin(x + cellSize/2, y + cellSize/2, cellSize * 0.25);
+                        drawCoin(x + cellSize/2, y + cellSize/2, cellSize * 0.23);
                     } else if (cell === '5') {
                         drawWaterPit(x, y, cellSize);
                     } else if (r === activeLevelConfig.goalPos.r && c === activeLevelConfig.goalPos.c) {
@@ -1061,37 +1027,35 @@
                 }
             }
 
-            // 2. วาดตัวละครผู้เล่น & สัตว์เลี้ยงคู่กาย
             const heroX = playerPos.c * cellSize + cellSize / 2;
             const heroY = playerPos.r * cellSize + cellSize / 2;
-            drawHero(heroX, heroY, cellSize * 0.35);
-            drawPet(heroX + cellSize * 0.3, heroY - cellSize * 0.3, cellSize * 0.14);
+            drawHero(heroX, heroY, cellSize * 0.33);
+            drawPet(heroX + cellSize * 0.28, heroY - cellSize * 0.28, cellSize * 0.12);
         }
 
-        // วาดต้นไม้และหินแบบ 3D แบนสุดพรีเมียม
         function drawObstacle(x, y, size, type) {
             ctx.save();
             if (type === 'tree') {
                 ctx.fillStyle = '#854d0e';
-                ctx.fillRect(x + size * 0.44, y + size * 0.6, size * 0.12, size * 0.3);
+                ctx.fillRect(x + size * 0.44, y + size * 0.58, size * 0.12, size * 0.3);
 
                 ctx.beginPath();
-                ctx.arc(x + size * 0.5, y + size * 0.4, size * 0.28, 0, Math.PI * 2);
+                ctx.arc(x + size * 0.5, y + size * 0.4, size * 0.26, 0, Math.PI * 2);
                 ctx.fillStyle = '#22c55e';
                 ctx.fill();
 
                 ctx.beginPath();
-                ctx.arc(x + size * 0.4, y + size * 0.32, size * 0.2, 0, Math.PI * 2);
+                ctx.arc(x + size * 0.4, y + size * 0.32, size * 0.18, 0, Math.PI * 2);
                 ctx.fillStyle = '#4ade80';
                 ctx.fill();
             } else {
                 ctx.beginPath();
-                ctx.ellipse(x + size * 0.5, y + size * 0.65, size * 0.3, size * 0.22, 0, 0, Math.PI * 2);
+                ctx.ellipse(x + size * 0.5, y + size * 0.65, size * 0.28, size * 0.2, 0, 0, Math.PI * 2);
                 ctx.fillStyle = '#94a3b8';
                 ctx.fill();
 
                 ctx.beginPath();
-                ctx.ellipse(x + size * 0.44, y + size * 0.58, size * 0.15, size * 0.08, 0, 0, Math.PI * 2);
+                ctx.ellipse(x + size * 0.44, y + size * 0.58, size * 0.13, size * 0.07, 0, 0, Math.PI * 2);
                 ctx.fillStyle = '#cbd5e1';
                 ctx.fill();
             }
@@ -1111,7 +1075,7 @@
             ctx.fillStyle = '#f59e0b';
             ctx.fill();
             ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1.5;
             ctx.stroke();
             ctx.restore();
         }
@@ -1123,7 +1087,7 @@
             ctx.fillStyle = '#fbbf24';
             ctx.fill();
             ctx.strokeStyle = '#d97706';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 2.5;
             ctx.stroke();
 
             ctx.beginPath();
@@ -1136,11 +1100,11 @@
         function drawWaterPit(x, y, size) {
             ctx.save();
             ctx.beginPath();
-            ctx.ellipse(x + size/2, y + size/2, size * 0.36, size * 0.26, 0.1, 0, Math.PI*2);
+            ctx.ellipse(x + size/2, y + size/2, size * 0.35, size * 0.25, 0.1, 0, Math.PI*2);
             ctx.fillStyle = '#0284c7';
             ctx.fill();
             ctx.strokeStyle = '#38bdf8';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1.5;
             ctx.stroke();
             ctx.restore();
         }
@@ -1167,7 +1131,6 @@
             ctx.save();
             const char = gameState.character;
             
-            // หน้าตาตัวละครกิ๊บเก๋ลอยขึ้นเบา ๆ ตามสเตต
             if (char === 'boy') {
                 ctx.beginPath();
                 ctx.arc(cx, cy, r, 0, Math.PI*2);
@@ -1181,14 +1144,14 @@
 
                 ctx.fillStyle = '#1e293b';
                 ctx.beginPath();
-                ctx.arc(cx - r*0.3, cy + r*0.1, r*0.15, 0, Math.PI*2);
-                ctx.arc(cx + r*0.3, cy + r*0.1, r*0.15, 0, Math.PI*2);
+                ctx.arc(cx - r*0.3, cy + r*0.1, r*0.14, 0, Math.PI*2);
+                ctx.arc(cx + r*0.3, cy + r*0.1, r*0.14, 0, Math.PI*2);
                 ctx.fill();
 
                 ctx.strokeStyle = '#c2410c';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2.5;
                 ctx.beginPath();
-                ctx.arc(cx, cy + r*0.25, r*0.2, 0, Math.PI);
+                ctx.arc(cx, cy + r*0.25, r*0.18, 0, Math.PI);
                 ctx.stroke();
             } else if (char === 'girl') {
                 ctx.beginPath();
@@ -1203,32 +1166,32 @@
 
                 ctx.fillStyle = '#1e293b';
                 ctx.beginPath();
-                ctx.arc(cx - r*0.3, cy, r*0.16, 0, Math.PI*2);
-                ctx.arc(cx + r*0.3, cy, r*0.16, 0, Math.PI*2);
+                ctx.arc(cx - r*0.3, cy, r*0.14, 0, Math.PI*2);
+                ctx.arc(cx + r*0.3, cy, r*0.14, 0, Math.PI*2);
                 ctx.fill();
 
                 ctx.strokeStyle = '#be185d';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2.5;
                 ctx.beginPath();
-                ctx.arc(cx, cy + r*0.2, r*0.25, 0, Math.PI);
+                ctx.arc(cx, cy + r*0.2, r*0.22, 0, Math.PI);
                 ctx.stroke();
             } else if (char === 'robot') {
                 ctx.beginPath();
-                ctx.roundRect(cx - r, cy - r, r*2, r*2, 12);
+                ctx.roundRect(cx - r, cy - r, r*2, r*2, 10);
                 ctx.fillStyle = '#cbd5e1';
                 ctx.fill();
                 ctx.strokeStyle = '#475569';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2.5;
                 ctx.stroke();
 
                 ctx.fillStyle = '#1e293b';
-                ctx.roundRect(cx - r*0.7, cy - r*0.6, r*1.4, r*1.1, 8);
+                ctx.roundRect(cx - r*0.7, cy - r*0.6, r*1.4, r*1.1, 6);
                 ctx.fill();
 
                 ctx.fillStyle = '#06b6d4';
                 ctx.beginPath();
-                ctx.arc(cx - r*0.3, cy - r*0.1, r*0.18, 0, Math.PI*2);
-                ctx.arc(cx + r*0.3, cy - r*0.1, r*0.18, 0, Math.PI*2);
+                ctx.arc(cx - r*0.3, cy - r*0.1, r*0.15, 0, Math.PI*2);
+                ctx.arc(cx + r*0.3, cy - r*0.1, r*0.15, 0, Math.PI*2);
                 ctx.fill();
             } else if (char === 'cat') {
                 ctx.beginPath();
@@ -1236,25 +1199,24 @@
                 ctx.fillStyle = '#f8fafc';
                 ctx.fill();
 
-                // หูซ้ายขวา
                 ctx.beginPath();
                 ctx.moveTo(cx - r, cy);
-                ctx.lineTo(cx - r * 0.7, cy - r * 1.2);
+                ctx.lineTo(cx - r * 0.7, cy - r * 1.1);
                 ctx.lineTo(cx - r * 0.2, cy - r * 0.6);
                 ctx.fillStyle = '#fb7185';
                 ctx.fill();
 
                 ctx.beginPath();
                 ctx.moveTo(cx + r, cy);
-                ctx.lineTo(cx + r * 0.7, cy - r * 1.2);
+                ctx.lineTo(cx + r * 0.7, cy - r * 1.1);
                 ctx.lineTo(cx + r * 0.2, cy - r * 0.6);
                 ctx.fillStyle = '#fb7185';
                 ctx.fill();
 
                 ctx.fillStyle = '#0f172a';
                 ctx.beginPath();
-                ctx.arc(cx - r*0.3, cy + r*0.1, r*0.14, 0, Math.PI*2);
-                ctx.arc(cx + r*0.3, cy + r*0.1, r*0.14, 0, Math.PI*2);
+                ctx.arc(cx - r*0.3, cy + r*0.1, r*0.12, 0, Math.PI*2);
+                ctx.arc(cx + r*0.3, cy + r*0.1, r*0.12, 0, Math.PI*2);
                 ctx.fill();
             }
             ctx.restore();
@@ -1263,7 +1225,7 @@
         function drawPet(cx, cy, r) {
             ctx.save();
             const pet = gameState.pet;
-            ctx.shadowBlur = 6;
+            ctx.shadowBlur = 4;
             ctx.shadowColor = 'rgba(0,0,0,0.1)';
 
             if (pet === 'slime') {
@@ -1274,8 +1236,8 @@
 
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
-                ctx.arc(cx - r*0.3, cy - r*0.1, r*0.25, 0, Math.PI*2);
-                ctx.arc(cx + r*0.3, cy - r*0.1, r*0.25, 0, Math.PI*2);
+                ctx.arc(cx - r*0.3, cy - r*0.1, r*0.22, 0, Math.PI*2);
+                ctx.arc(cx + r*0.3, cy - r*0.1, r*0.22, 0, Math.PI*2);
                 ctx.fill();
             } else if (pet === 'dragon') {
                 ctx.beginPath();
@@ -1285,7 +1247,7 @@
 
                 ctx.beginPath();
                 ctx.moveTo(cx - r, cy - r);
-                ctx.lineTo(cx - r*1.5, cy - r*1.5);
+                ctx.lineTo(cx - r*1.4, cy - r*1.4);
                 ctx.lineTo(cx - r*0.5, cy - r);
                 ctx.fillStyle = '#e11d48';
                 ctx.fill();
@@ -1297,14 +1259,14 @@
 
                 ctx.fillStyle = '#fef08a';
                 ctx.beginPath();
-                ctx.arc(cx - r*0.3, cy, r*0.35, 0, Math.PI*2);
-                ctx.arc(cx + r*0.3, cy, r*0.35, 0, Math.PI*2);
+                ctx.arc(cx - r*0.3, cy, r*0.3, 0, Math.PI*2);
+                ctx.arc(cx + r*0.3, cy, r*0.3, 0, Math.PI*2);
                 ctx.fill();
             }
             ctx.restore();
         }
 
-        // --- ระบบสลับหน้าจอ (Navigation) ---
+        // --- ระบบสลับหน้าจอ (Screen Switching Layout Lock) ---
         function showScreen(screenId) {
             document.getElementById('screen-welcome').classList.add('hidden');
             document.getElementById('screen-map').classList.add('hidden');
@@ -1317,7 +1279,6 @@
             }
         }
 
-        // --- โหมดสเตตและการเลือกคู่หูผจญภัย ---
         function selectCharacter(char) {
             gameState.character = char;
             document.querySelectorAll('[id^="char-"]').forEach(btn => btn.classList.replace('border-brandSky', 'border-transparent'));
@@ -1354,7 +1315,7 @@
             showScreen('screen-welcome');
         }
 
-        // --- ระบบแผนที่คดเคี้ยวพริ้วไหว Candy Crush / Duolingo Path ---
+        // --- สร้างและจัดระดับแผนผังสไตล์เวิลด์คดเคี้ยวเลื่อนได้ ---
         function renderWorldMap() {
             const tabs = document.getElementById('world-tabs');
             tabs.innerHTML = '';
@@ -1364,16 +1325,16 @@
                 const isLocked = gameState.unlockedLevels < w.range[0];
 
                 const btn = document.createElement('button');
-                btn.className = `p-2.5 rounded-2xl font-black text-xs md:text-sm text-center transition-all ${
+                btn.className = `p-1.5 md:p-2 rounded-xl font-black text-[10px] md:text-xs text-center transition-all ${
                     isActive 
-                    ? 'bg-gradient-to-r from-brandSky to-indigo-500 text-white shadow-md' 
+                    ? 'bg-gradient-to-r from-brandSky to-indigo-500 text-white shadow-sm' 
                     : isLocked 
                     ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
-                    : 'bg-white text-slate-700 hover:bg-sky-50 shadow-sm'
+                    : 'bg-white text-slate-700 hover:bg-sky-50 shadow-xs'
                 }`;
                 btn.innerHTML = `
-                    <span class="block text-sm md:text-base">${w.name.split(' ')[0]}</span>
-                    <span class="text-[9px] block opacity-80">${w.name.split(' ').slice(1).join(' ')}</span>
+                    <span class="block font-bold text-xs">${w.name.split(' ')[0]}</span>
+                    <span class="hidden md:block text-[8px] opacity-80">${w.name.split(' ').slice(1).join(' ')}</span>
                 `;
                 if (!isLocked) {
                     btn.onclick = () => {
@@ -1385,12 +1346,10 @@
                 tabs.appendChild(btn);
             });
 
-            // อัปเดตคำอธิบายเวิลด์
             const currWorld = worlds.find(w => w.id === selectedWorldId);
             document.getElementById('current-world-title').innerText = currWorld.name;
             document.getElementById('current-world-desc').innerText = currWorld.desc;
 
-            // สร้างเส้นทางเดินบอร์ดลัดเลาะคดเคี้ยวสไตล์ Candy Crush
             const pathContainer = document.getElementById('winding-path');
             pathContainer.innerHTML = '';
 
@@ -1404,15 +1363,14 @@
                 const nodeWrapper = document.createElement('div');
                 nodeWrapper.className = "relative flex flex-col items-center z-10 w-full";
 
-                // คำนวณความเบี่ยงเบนซ้าย/ขวาเพื่อความสวยงามสไตล์พริ้วไหว
-                const offsetClass = (i % 2 === 0) ? 'translate-x-12' : '-translate-x-12';
+                const offsetClass = (i % 2 === 0) ? 'translate-x-10' : '-translate-x-10';
 
                 const nodeBtn = document.createElement('button');
                 if (isUnlocked) {
-                    nodeBtn.className = `w-16 h-16 rounded-full border-4 text-white font-black text-xl flex items-center justify-center transform transition duration-150 active:scale-90 ${offsetClass} ${
+                    nodeBtn.className = `w-14 h-14 rounded-full border-4 text-white font-black text-lg flex items-center justify-center transform transition duration-150 active:scale-90 ${offsetClass} ${
                         isCurrent 
                         ? 'bg-brandYellow border-white shadow-lg bobbing' 
-                        : 'bg-brandMint border-white shadow-md hover:scale-110'
+                        : 'bg-brandMint border-white shadow-sm hover:scale-110'
                     }`;
                     nodeBtn.innerHTML = `${i}`;
                     nodeBtn.onclick = () => {
@@ -1420,12 +1378,12 @@
                         playSynthSound('click');
                     };
                 } else {
-                    nodeBtn.className = `w-16 h-16 rounded-full bg-slate-300 border-4 border-slate-200 text-slate-400 font-black text-xl flex items-center justify-center cursor-not-allowed ${offsetClass}`;
+                    nodeBtn.className = `w-14 h-14 rounded-full bg-slate-300 border-4 border-slate-200 text-slate-400 font-black text-lg flex items-center justify-center cursor-not-allowed ${offsetClass}`;
                     nodeBtn.innerHTML = '🔒';
                 }
 
                 const nodeLabel = document.createElement('span');
-                nodeLabel.className = `absolute -bottom-6 font-black text-xs bg-slate-800 text-white px-2 py-0.5 rounded-full shadow ${offsetClass}`;
+                nodeLabel.className = `absolute -bottom-5 font-black text-[9px] bg-slate-800 text-white px-2 py-0.5 rounded-full shadow ${offsetClass}`;
                 nodeLabel.innerText = levels[i]?.title || "ด่านปริศนา";
 
                 nodeWrapper.appendChild(nodeBtn);
@@ -1434,7 +1392,7 @@
             }
         }
 
-        // --- โหลดสคริปต์ฉบับด่านพรีเมียม ---
+        // --- ระบบด่านอัจฉริยะ ---
         function loadLevel(lvlNum) {
             gameState.currentLevel = lvlNum;
             const lvlConfig = levels[lvlNum];
@@ -1443,16 +1401,15 @@
             workspaceBlocks = [];
             document.getElementById('workspace-placeholder').style.display = 'block';
             document.getElementById('workspace-list').innerHTML = `
-                <div id="workspace-placeholder" class="text-center text-slate-400 py-8 text-xs font-bold">
-                    <span class="block text-4xl mb-1">🎮</span>
-                    แตะบล็อกด้านบนเพื่อจัดลำดับคำสั่งที่นี่!
+                <div id="workspace-placeholder" class="text-center text-slate-400 py-6 text-[10px] font-bold">
+                    <span class="block text-xl mb-1">⚙️</span>
+                    ต่อบล็อกเพื่อจัดลำดับขั้นตอน
                 </div>
             `;
 
             activeLevelConfig = JSON.parse(JSON.stringify(lvlConfig));
             playerPos = { ...activeLevelConfig.startPos };
 
-            // นับไอเทมที่ต้องรวบรวม
             totalCollectiblesInLevel = 0;
             gatheredCollectibles = 0;
             for (let r = 0; r < activeLevelConfig.grid.length; r++) {
@@ -1463,12 +1420,10 @@
                 }
             }
 
-            // จัดหน้า UI แดชบอร์ดในด่าน
             document.getElementById('gameplay-world-badge').innerText = `World ${Math.ceil(lvlNum / 4)}`;
             document.getElementById('gameplay-level-title').innerText = `ด่านที่ ${lvlNum}: ${lvlConfig.title}`;
             document.getElementById('ai-message').innerText = lvlConfig.hint;
 
-            // โหมดจำกัดการทำงานคำสั่งเพื่อการศึกษาที่เข้มข้นขึ้น
             const limitBadge = document.getElementById('limit-badge-container');
             if (gameState.mode === 'coding' || lvlNum >= 12) {
                 limitBadge.classList.remove('hidden');
@@ -1487,9 +1442,7 @@
             document.getElementById('player-stars').innerText = gameState.stars;
             document.getElementById('player-coins').innerText = gameState.coins;
             document.getElementById('player-lv').innerText = gameState.level;
-            document.getElementById('player-xp').innerText = gameState.xp;
             
-            // แถบค่าความสามารถ XP
             const percent = (gameState.xp / 200) * 100;
             document.getElementById('xp-bar-fill').style.width = `${percent}%`;
         }
@@ -1505,7 +1458,7 @@
             }
         }
 
-        // --- ระบบจัดทำบล็อกสเปซ Scratch-Style ---
+        // --- จัดการรันเวย์โค้ด Blockly ---
         const cmdIcons = {
             'up': '⬆️ ขึ้น (UP)',
             'down': '⬇️ ลง (DOWN)',
@@ -1555,33 +1508,31 @@
 
             workspaceBlocks.forEach((type, idx) => {
                 const blockDiv = document.createElement('div');
-                // ใช้การตัดมุมสไตล์ Scratch
-                blockDiv.className = `scratch-block flex justify-between items-center text-white px-4 py-2.5 shadow border-b-4 ${cmdBgClasses[type]} text-xs font-black select-none`;
+                blockDiv.className = `scratch-block flex justify-between items-center text-white px-3 py-1.5 shadow border-b-2 ${cmdBgClasses[type]} text-[10px] font-black select-none`;
                 blockDiv.id = `workspace-block-${idx}`;
                 blockDiv.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <span class="bg-black/30 rounded-full w-5 h-5 flex items-center justify-center text-[10px]">${idx + 1}</span>
+                    <div class="flex items-center gap-1.5">
+                        <span class="bg-black/30 rounded-full w-4 h-4 flex items-center justify-center text-[8px]">${idx + 1}</span>
                         <span>${cmdIcons[type]}</span>
                     </div>
-                    <button onclick="removeBlock(${idx})" class="bg-red-600/60 p-1.5 rounded-lg hover:bg-red-700 transition">❌</button>
+                    <button onclick="removeBlock(${idx})" class="bg-red-600/60 p-1 rounded-md hover:bg-red-700 transition">❌</button>
                 `;
                 list.appendChild(blockDiv);
             });
         }
 
-        // --- ระบบรันอัลกอริทึมพรีเมียม (รันทีละบล็อกสว่างวาบเรขาคณิต) ---
+        // --- รันอัลกอริทึมสะกดจิตเด็กพร้อมความถูกต้อง ---
         function runAlgorithm() {
             if (isRunningCode) return;
             if (workspaceBlocks.length === 0) {
-                document.getElementById('ai-message').innerText = "🤖 'โอ๊ะโอ! กรุณาเลือกบล็อกคำสั่งสวมต่อก่อนเริ่มวิเคราะห์ระบบนะ!'";
+                document.getElementById('ai-message').innerText = "🤖 'อุ๊ย! คุณยังไม่มีบล็อกสำหรับวิเคราะห์กระบวนการเลยนะ!'";
                 playSynthSound('wrong');
                 return;
             }
 
-            // เช็คโค้ดประหยัดพลังงาน
             if (gameState.mode === 'coding' || gameState.currentLevel >= 12) {
                 if (workspaceBlocks.length > activeLevelConfig.limit) {
-                    document.getElementById('ai-message').innerText = `🤖 'ยอดเยี่ยมแต่ว่าคุณเขียนรหัสยาวเกินลิมิต ${activeLevelConfig.limit} บล็อกนะ ลองใช้บล็อกทำซ้ำย่นย่อดู!'`;
+                    document.getElementById('ai-message').innerText = `🤖 'เกินลิมิต ${activeLevelConfig.limit} บล็อกนะ ลองสลับใช้บล็อกทำซ้ำย่นย่อดู!'`;
                     playSynthSound('wrong');
                     return;
                 }
@@ -1591,9 +1542,7 @@
             document.getElementById('run-btn').disabled = true;
             document.getElementById('run-btn').classList.add('opacity-50');
 
-            // คอมไพล์บล็อก (รวมลูปทำซ้ำ)
             codeSequence = [];
-            // เพื่อไฮไลต์บล็อกเรียลไทม์ เราจะสร้างแผ่นผังอ้างอิงลำดับบล็อกต้นฉบับด้วย
             let blockReferenceIndices = [];
 
             for (let i = 0; i < workspaceBlocks.length; i++) {
@@ -1614,7 +1563,6 @@
 
             let step = 0;
             executionInterval = setInterval(() => {
-                // เอาไฮไลท์สีทองออกจากบล็อกก่อนหน้า
                 document.querySelectorAll('.scratch-block').forEach(b => b.classList.remove('block-running'));
 
                 if (step >= codeSequence.length) {
@@ -1623,14 +1571,13 @@
                     return;
                 }
 
-                // ส่องแสงสว่างวาบสีทองที่บล็อกที่ทำงานอยู่ ณ ขณะนี้!
                 const activeRefIdx = blockReferenceIndices[step];
                 const blockEl = document.getElementById(`workspace-block-${activeRefIdx}`);
                 if (blockEl) blockEl.classList.add('block-running');
 
                 executeSingleCommand(codeSequence[step]);
                 step++;
-            }, 650);
+            }, 600);
         }
 
         function stopAlgorithm() {
@@ -1671,7 +1618,6 @@
                 return;
             }
 
-            // เช็คการตกจากขอบโลกอวกาศหรือสิ่งกีดขวาง
             if (r >= 0 && r < rows && c >= 0 && c < cols) {
                 const cellVal = grid[r][c];
                 if (cellVal === '1' || cellVal === '5') {
@@ -1692,7 +1638,7 @@
             gameState.lives--;
             updateDashboard();
 
-            document.getElementById('ai-message').innerText = "🤖 'อุ๊ย! เส้นทางขัดข้องไปลุยอุปสรรค พลังลดลง 1 หัวใจ ลองเขียนลำดับใหม่สิ!'";
+            document.getElementById('ai-message').innerText = "🤖 'อุ๊ย! ผิดขั้นตอนไปชนอุปสรรค พลังลดลง 1 หัวใจ ลองเขียนลำดับใหม่สิ!'";
             canvas.classList.add('animate-shake');
             setTimeout(() => canvas.classList.remove('animate-shake'), 400);
 
@@ -1719,26 +1665,24 @@
                     playSynthSound('wrong');
                 }
             } else {
-                document.getElementById('ai-message').innerText = "🤖 'เขียนโค้ดได้สมบูรณ์แต่ยังไม่ถึงธงชัย ลองเพิ่มบล็อกอีกซักนิดสิ!'";
+                document.getElementById('ai-message').innerText = "🤖 'เขียนโค้ดได้สมบูรณ์แต่ยังไม่ถึงธงชัย ลองปรับปรุงความต่อเนื่องนะ!'";
                 playSynthSound('wrong');
             }
         }
 
-        // ชัยชนะแชมเปี้ยน 3 ดาวสุดเก๋ไก๋
         function triggerLevelSuccess() {
             playSynthSound('success');
 
-            // คำนวณดาวทองตามระดับคุณภาพความสั้นกระชับของโค้ด
             let starNum = 1;
             if (workspaceBlocks.length <= activeLevelConfig.limit) {
                 starNum = 3;
-                document.getElementById('star-efficiency-message').innerText = "โค้ดติ้งระดับเทพสั้นประหยัดที่สุด! รับ 3 ดาวทองเกียรติคุณ";
+                document.getElementById('star-efficiency-message').innerText = "เขียนสั้นประหยัดที่สุด! รับ 3 ดาวทองเกียรติคุณ";
             } else if (workspaceBlocks.length <= activeLevelConfig.limit + 2) {
                 starNum = 2;
-                document.getElementById('star-efficiency-message').innerText = "วิเคราะห์ระบบดีมาก! พยายามย่นสคริปต์ให้สั้นลงอีกนิดจะเทพสุดยอด";
+                document.getElementById('star-efficiency-message').innerText = "เยี่อมมาก! พยายามจัดลูปช่วยย่นโค้ดให้สั้นลงเพื่อรับ 3 ดาวนะ";
             } else {
                 starNum = 1;
-                document.getElementById('star-efficiency-message').innerText = "สำเร็จเป้าหมายแล้ว! มาเรียนรู้วิธีการย่นลูปในบทถัดไปนะ";
+                document.getElementById('star-efficiency-message').innerText = "สำเร็จเป้าหมายแล้ว! มาพัฒนาอัลกอริทึมกันต่อเลย";
             }
 
             let starsHTML = '';
@@ -1748,7 +1692,6 @@
             }
             document.getElementById('stars-congratulations').innerHTML = `<span class="text-amber-400 font-extrabold">${starsHTML}</span>`;
 
-            // แต้มรางวัล
             gameState.coins += 20;
             gameState.xp += 60;
             if (gameState.xp >= 200) {
@@ -1758,7 +1701,7 @@
 
             document.getElementById('reward-coins').innerText = `+20 ทอง`;
             document.getElementById('reward-xp').innerText = `+60 XP`;
-            document.getElementById('reward-item').innerText = gameState.character === 'boy' ? "หมวกแชมป์" : "สกินเมจิก";
+            document.getElementById('reward-item').innerText = gameState.character === 'boy' ? "หมวกแชมป์" : "คีย์วิเศษ";
 
             if (gameState.currentLevel === gameState.unlockedLevels) {
                 gameState.unlockedLevels = Math.min(20, gameState.unlockedLevels + 1);
@@ -1787,15 +1730,14 @@
 
         function toggleHint() {
             const tips = [
-                "ลองมองหาเส้นทางที่ไม่มีต้นไม้และหลุมน้ำอ้อมไปทางข้างเสมอ!",
-                "รหัสที่ดีที่สุดเกิดจากบล็อกคำสั่ง 'Repeat' เพื่อทวีความคูณสองเท่า",
-                "อย่าลืมสะสมแต้มดาวและรหัส 'เก็บสมบัติ' (COLLECT) ด้วยล่ะแชมเปี้ยน",
-                "วิเคราะห์ระบบแบบจิ๊กซอว์ คิดช้า ๆ ทีละบล็อกไม่มีอะไรต้องรีบ!"
+                "หลีกเลี่ยงต้นไม้ใหญ่และแม่น้ำลึกด้วยการเดินอ้อมทางซ้ายขวานะ!",
+                "ปุ่มทำซ้ำ (Repeat) จะจำคำสั่งล่าสุดมาเบิ้ล 2 รอบ มีประโยชน์มาก!",
+                "อย่าลืมเดินเก็บสมบัติ (Collect) ก่อนก้าวเข้าประตูธงชัยชนะ",
+                "วิเคราะห์ใจเย็น ๆ ต่อบล็อกช้า ๆ อย่างมั่นคงไม่มีผิดหวัง!"
             ];
             document.getElementById('ai-message').innerText = tips[Math.floor(Math.random() * tips.length)];
         }
 
-        // --- เอฟเฟกต์ประจุส่องประกายอนุภาคดาว (Sparkles) ---
         function createSparks(r, c) {
             const rect = canvas.getBoundingClientRect();
             const grid = activeLevelConfig.grid;
@@ -1805,39 +1747,39 @@
             const tx = rect.left + window.scrollX + (c * cellSize) + cellSize/2;
             const ty = rect.top + window.scrollY + (r * cellSize) + cellSize/2;
 
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < 10; i++) {
                 const spark = document.createElement('div');
-                spark.className = 'sparkle-particle w-3 h-3 rounded-full bg-brandYellow';
+                spark.className = 'sparkle-particle w-2.5 h-2.5 rounded-full bg-brandYellow';
                 spark.style.left = `${tx}px`;
                 spark.style.top = `${ty}px`;
                 document.body.appendChild(spark);
 
                 const angle = Math.random() * Math.PI * 2;
-                const dist = 20 + Math.random() * 40;
+                const dist = 15 + Math.random() * 30;
                 const destX = tx + Math.cos(angle) * dist;
                 const destY = ty + Math.sin(angle) * dist;
 
                 spark.animate([
                     { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-                    { transform: `translate(${destX - tx}px, ${destY - ty}px) scale(0)`, opacity: 0 }
+                    { transform: `translate(${destX - tx}px, ${destY - ty}px) scale(0)', opacity: 0 }
                 ], {
-                    duration: 600 + Math.random() * 400,
+                    duration: 500 + Math.random() * 300,
                     easing: 'ease-out',
                     fill: 'forwards'
                 });
 
-                setTimeout(() => spark.remove(), 1000);
+                setTimeout(() => spark.remove(), 800);
             }
         }
 
-        // --- โหมดอิสระทดลองวาดผังด่านอัจฉริยะ (FREE PLAY BUILDER) ---
+        // --- โหมดอิสระออกแบบด่านอัจฉริยะ ---
         function setupEditorGrid() {
             const container = document.getElementById('editor-grid-container');
             container.innerHTML = '';
             for (let r = 0; r < 6; r++) {
                 for (let c = 0; c < 6; c++) {
                     const cell = document.createElement('div');
-                    cell.className = "border border-sky-200 bg-white/50 hover:bg-sky-200/50 cursor-pointer flex items-center justify-center text-2xl transition";
+                    cell.className = "border border-sky-200 bg-white/50 hover:bg-sky-200/50 cursor-pointer flex items-center justify-center text-xl transition";
                     
                     const val = customGrid[r][c];
                     if (val === 'S') cell.innerText = '🏃';
@@ -1923,9 +1865,9 @@
             workspaceBlocks = [];
             document.getElementById('workspace-placeholder').style.display = 'block';
             document.getElementById('workspace-list').innerHTML = `
-                <div id="workspace-placeholder" class="text-center text-slate-400 py-8 text-xs font-bold">
-                    <span class="block text-4xl mb-1">🎮</span>
-                    แตะบล็อกด้านบนเพื่อจัดลำดับคำสั่งที่นี่!
+                <div id="workspace-placeholder" class="text-center text-slate-400 py-6 text-[10px] font-bold">
+                    <span class="block text-xl mb-1">⚙️</span>
+                    ต่อบล็อกเพื่อจัดลำดับขั้นตอน
                 </div>
             `;
 
@@ -1937,16 +1879,15 @@
             setTimeout(resizeCanvas, 100);
         }
 
-        // --- ระบบบันทึกเกมสถิติลงหน่วยความจำเครื่อง ---
         function saveGameData() {
             try {
-                localStorage.setItem('algorithm_quest_saved_v2', JSON.stringify(gameState));
+                localStorage.setItem('algorithm_quest_saved_v3', JSON.stringify(gameState));
             } catch(e){}
         }
 
         function loadGameData() {
             try {
-                const data = localStorage.getItem('algorithm_quest_saved_v2');
+                const data = localStorage.getItem('algorithm_quest_saved_v3');
                 if (data) {
                     gameState = { ...gameState, ...JSON.parse(data) };
                     updateDashboard();
@@ -1954,7 +1895,6 @@
             } catch(e){}
         }
 
-        // โหลดระบบเริ่มต้นแอปสโตร์
         window.onload = function() {
             loadGameData();
             document.addEventListener('touchstart', function() {}, {passive: true});
@@ -1962,12 +1902,12 @@
         }
     </script>
 
-    <!-- คลาสเขย่าจอสั่นสยิวกายเวลาขัดข้องผิดพลาด -->
+    <!-- คลาสเอฟเฟกต์สั่นเวลาระบบขัดข้องชนสิ่งกีดขวาง -->
     <style>
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+            20%, 40%, 60%, 80% { transform: translateX(4px); }
         }
         .animate-shake {
             animation: shake 0.4s ease-in-out;
