@@ -381,19 +381,29 @@
 
                 <!-- HERO SELECTOR -->
                 <div class="my-2 bg-slate-50/80 p-3 rounded-2xl border border-slate-100">
-                    <h3 class="text-xs font-black text-slate-500 mb-2">🤖 เลือกฮีโร่และสัตว์เลี้ยง</h3>
+                    <h3 class="text-xs font-black text-slate-500 mb-2">🤖 เลือกฮีโร่ผจญภัย & สัตว์เลี้ยงเลี้ยง</h3>
                     <div class="flex justify-center items-center gap-4 flex-wrap">
-                        <div class="flex gap-1.5">
-                            <button onclick="initAudio(); selectCharacter('boy')" id="char-boy" class="border-2 border-brandSky bg-white p-2 rounded-xl text-2xl transition">👦</button>
-                            <button onclick="initAudio(); selectCharacter('girl')" id="char-girl" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">👧</button>
-                            <button onclick="initAudio(); selectCharacter('robot')" id="char-robot" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🤖</button>
-                            <button onclick="initAudio(); selectCharacter('cat')" id="char-cat" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🐱</button>
+                        <!-- Hero selection -->
+                        <div>
+                            <span class="block text-[10px] text-slate-400 font-extrabold mb-1">ตัวละครฮีโร่</span>
+                            <div class="flex gap-1.5">
+                                <button onclick="initAudio(); selectCharacter('boy')" id="char-boy" class="border-2 border-brandSky bg-white p-2 rounded-xl text-2xl transition hover:scale-105 active:scale-95">👦</button>
+                                <button onclick="initAudio(); selectCharacter('girl')" id="char-girl" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition hover:scale-105 active:scale-95">👧</button>
+                                <button onclick="initAudio(); selectCharacter('robot')" id="char-robot" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition hover:scale-105 active:scale-95">🤖</button>
+                                <button onclick="initAudio(); selectCharacter('cat')" id="char-cat" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition hover:scale-105 active:scale-95">🐱</button>
+                            </div>
                         </div>
-                        <div class="w-px h-6 bg-slate-200"></div>
-                        <div class="flex gap-1.5">
-                            <button onclick="initAudio(); selectPet('slime')" id="pet-slime" class="border-2 border-brandSky bg-white p-2 rounded-xl text-2xl transition">🟢</button>
-                            <button onclick="initAudio(); selectPet('dragon')" id="pet-dragon" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🐉</button>
-                            <button onclick="initAudio(); selectPet('owl')" id="pet-owl" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition">🦉</button>
+                        
+                        <div class="w-px h-10 bg-slate-200"></div>
+                        
+                        <!-- Pet selection -->
+                        <div>
+                            <span class="block text-[10px] text-slate-400 font-extrabold mb-1">สัตว์เลี้ยง</span>
+                            <div class="flex gap-1.5">
+                                <button onclick="initAudio(); selectPet('slime')" id="pet-slime" class="border-2 border-brandSky bg-white p-2 rounded-xl text-2xl transition hover:scale-105 active:scale-95">🟢</button>
+                                <button onclick="initAudio(); selectPet('dragon')" id="pet-dragon" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition hover:scale-105 active:scale-95">🐉</button>
+                                <button onclick="initAudio(); selectPet('owl')" id="pet-owl" class="border-2 border-transparent bg-white p-2 rounded-xl text-2xl transition hover:scale-105 active:scale-95">🦉</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1197,23 +1207,54 @@
                 ctx.arc(cx, cy + r*0.2, r*0.22, 0, Math.PI);
                 ctx.stroke();
             } else if (char === 'robot') {
+                // อัปเกรดดีไซน์ตัวหุ่นยนต์คู่หูแสนน่ารักสไตล์ดิสนีย์โรบอท
+                // วาดหัวกลมนวมพรีเมียม
                 ctx.beginPath();
-                ctx.roundRect(cx - r, cy - r, r*2, r*2, 10);
+                ctx.roundRect(cx - r, cy - r, r*2, r*2, 14);
                 ctx.fillStyle = '#cbd5e1';
                 ctx.fill();
                 ctx.strokeStyle = '#475569';
-                ctx.lineWidth = 2.5;
+                ctx.lineWidth = 3;
                 ctx.stroke();
 
-                ctx.fillStyle = '#1e293b';
-                ctx.roundRect(cx - r*0.7, cy - r*0.6, r*1.4, r*1.1, 6);
+                // หูไฟสัญญาณเสาอากาศด้านบน
+                ctx.beginPath();
+                ctx.moveTo(cx, cy - r);
+                ctx.lineTo(cx, cy - r * 1.3);
+                ctx.strokeStyle = '#64748b';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(cx, cy - r * 1.3, r * 0.15, 0, Math.PI * 2);
+                ctx.fillStyle = '#fb923c'; // ส้มสว่าง
                 ctx.fill();
 
-                ctx.fillStyle = '#06b6d4';
-                ctx.beginPath();
-                ctx.arc(cx - r*0.3, cy - r*0.1, r*0.15, 0, Math.PI*2);
-                ctx.arc(cx + r*0.3, cy - r*0.1, r*0.15, 0, Math.PI*2);
+                // หน้าจอเรืองแสงสีน้ำเงินเข้ม
+                ctx.fillStyle = '#1e293b';
+                ctx.roundRect(cx - r*0.75, cy - r*0.65, r*1.5, r*1.1, 8);
                 ctx.fill();
+
+                // ดวงตากลมใหญ่สีฟ้าเรืองแสงดูมีความสุข
+                ctx.fillStyle = '#22d3ee';
+                ctx.beginPath();
+                ctx.arc(cx - r*0.3, cy - r*0.15, r*0.2, 0, Math.PI*2);
+                ctx.arc(cx + r*0.3, cy - r*0.15, r*0.2, 0, Math.PI*2);
+                ctx.fill();
+                
+                // ประกายตา
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(cx - r*0.25, cy - r*0.2, r*0.06, 0, Math.PI*2);
+                ctx.arc(cx + r*0.35, cy - r*0.2, r*0.06, 0, Math.PI*2);
+                ctx.fill();
+
+                // รอยยิ้มดิจิตอล
+                ctx.strokeStyle = '#4ade80'; // เขียวสดใส
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.arc(cx, cy + r*0.18, r*0.25, 0.1 * Math.PI, 0.9 * Math.PI);
+                ctx.stroke();
             } else if (char === 'cat') {
                 ctx.beginPath();
                 ctx.arc(cx, cy, r, 0, Math.PI*2);
@@ -1836,7 +1877,7 @@
 
                 spark.animate([
                     { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-                    { transform: `translate(${destX - tx}px, ${destY - ty}px) scale(0)`, opacity: 0 }
+                    { transform: 'translate(' + (destX - tx) + 'px, ' + (destY - ty) + 'px) scale(0)', opacity: 0 }
                 ], {
                     duration: 500 + Math.random() * 300,
                     easing: 'ease-out',
@@ -1986,6 +2027,12 @@
             document.addEventListener('click', function() {
                 initAudio();
             }, {passive: true});
+            
+            // ตั้งค่าไฮไลต์เริ่มต้นสำหรับตัวเลือกบนหน้าแรก
+            selectCharacter(gameState.character);
+            selectPet(gameState.pet);
+            selectGameMode(gameState.mode);
+            
             showScreen('screen-welcome');
         }
     </script>
