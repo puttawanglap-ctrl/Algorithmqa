@@ -2047,6 +2047,32 @@
         .animate-shake {
             animation: shake 0.4s ease-in-out;
         }
+
+        /* สำหรับการพิมพ์ใบประกาศเกียรติบัตร (PDF) ให้สวยงามพอดีหน้า */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #certificate-print-area, #certificate-print-area * {
+                visibility: visible;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            #certificate-print-area {
+                position: fixed;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%) scale(1.2) !important;
+                width: 90vw;
+                margin: 0;
+                padding: 0;
+                border: none !important;
+            }
+            @page {
+                size: landscape;
+                margin: 0;
+            }
+        }
     </style>
-</body>
-</html>
+</head>
+<body class="w-screen h-screen flex flex-col items-center justify-start p-2 md:p-4">
